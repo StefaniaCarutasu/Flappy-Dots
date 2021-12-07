@@ -9,7 +9,7 @@
 void setup() {
   Serial.begin(9600);
 
-  analogWrite(V0, contrasts[1]);
+  analogWrite(V0, contrasts[1].toInt());
 
   lcd.createChar(0, downArrowByte);
   lcd.createChar(1, upArrowByte);
@@ -23,6 +23,7 @@ void setup() {
   lc.setIntensity(0, matrixBrightness); // sets brightness (0~15 possible values)
   lc.clearDisplay(0);// clear screen
 
+  // joystick setup
   pinMode(pinSW, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(pinSW), checkSw, FALLING);
 
@@ -42,12 +43,24 @@ void checkSw() {
   // trying to eliminate the possible noise by waiting a few miliseconds before doing something
   if (millis() - lastDebounceTime > debounceInterval) {
     if (!gameStarted) {
-      currentMenuToDisplay = mainMenuItems[displayedItems[currentRow]];
-      changedMenu = !changedMenu;
-      resetMenuVariables();
-      lcd.clear();
-    }
+      if (lastDisplayedMenu == "LCD Constrast") {
+        setLCDContrast(currentItem);
+      }
+      else if (lastDisplayedMenu == "LCD Brightness") {
+        setLCDBrightness(currentItem);
+      }
+      else if (lastDisplayedMenu == "Matrix Brightness") {
+        setMatrixBrightness(currentItem);
+      }
+      else {
+        lcd.clear();
+        lastDisplayedMenu = currentMenuToDisplay;
+        currentMenuToDisplay = currentItem;
+        changedMenu = !changedMenu;
+        resetMenuVariables();
+      }
 
+    }
   }
 
   lastDebounceTime = millis();
@@ -63,6 +76,7 @@ void displayGreeting() {
 }
 
 void resetMenuVariables() {
+  lcd.clear();
   currentMenuItem = 0;
   currentRow = 0;
   displayedItems[0] = 0;
@@ -90,73 +104,67 @@ void switchMenues() {
     if (changedMenu) {
       changedMenu = !changedMenu;
     }
-    displayHighScores();
+    //displayHighScores();
   }
   else if (currentMenuToDisplay == "Settings") {
     // dispay the settings menu
     if (changedMenu) {
       changedMenu = !changedMenu;
     }
-    displaySettings();
+    displayMenu(settings);
   }
   else if (currentMenuToDisplay == "About") {
+    // dispay the about menu
+    if (changedMenu) {
+      changedMenu = !changedMenu;
+    }
+    displayMenu(about);
+  }
+  //  else if (currentMenuToDisplay == "Start Game") {
+  //    // start the game
+  //    if (changedMenu) {
+  //      changedMenu = !changedMenu;
+  //    }
+  //    initialliseGame();
+  //  }
+  else if (currentMenuToDisplay == "LCD Constrast") {
     // dispay the settings menu
     if (changedMenu) {
       changedMenu = !changedMenu;
     }
-    displayAbout();
+    displayMenu(contrasts);
   }
-  else if (currentMenuToDisplay == "Start Game") {
+  else if (currentMenuToDisplay == "LCD Brightness") {
     // dispay the settings menu
     if (changedMenu) {
       changedMenu = !changedMenu;
-    } 
-    game();
+    }
+
+    //displayLCDBrightnessSettings();
+  }
+  else if (currentMenuToDisplay == "Matrix Brightness") {
+    // dispay the settings menu
+    if (changedMenu) {
+      changedMenu = !changedMenu;
+    }
+    //currentSubmenu = "Matrix Brightness";
+    //displayMatrixBrightnessSettings();
+  }
+  else if (currentMenuToDisplay == "Back") {
+    // display the main menu
+    if (changedMenu) {
+      changedMenu = !changedMenu;
+    }
+    currentMenuToDisplay = "Main";
+    displayMenu(mainMenuItems);
   }
   else {
     // display the main menu
     if (changedMenu) {
       changedMenu = !changedMenu;
     }
-    displayMainMenu();
-  }
-}
 
-void displayMainMenu() {
-  // display the items in the menu that are indicated by the array
-  lcd.setCursor(0, 0);
-  if (currentRow == 0) {
-    lcd.write(rightArrow);
-    lcd.setCursor(1, 0);
-  }
-
-  lcd.print(mainMenuItems[displayedItems[0]]);
-
-
-  lcd.setCursor(0, 1);
-  if (currentRow == 1) {
-    lcd.write(rightArrow);
-    lcd.setCursor(1, 1);
-  }
-
-  lcd.print(mainMenuItems[displayedItems[1]]);
-  delay(350);
-  // if i am on the last item of the menu, i display the arrow pointing upwards
-  if (displayedItems[1] == 3) {
-    lcd.setCursor(15, 0);
-    lcd.write(upArrow);
-  }
-  // if i am on the first item of the menu, i display the arrow pointing downwards
-  else if (displayedItems[0] == 0) {
-    lcd.setCursor(15, 1);
-    lcd.write(downArrow);
-  }
-  // i display both arrows to show the player that they can go either way
-  else {
-    lcd.setCursor(15, 0);
-    lcd.write(upArrow);
-    lcd.setCursor(15, 1);
-    lcd.write(downArrow);
+    displayMenu(mainMenuItems);
   }
 }
 
@@ -206,28 +214,36 @@ void navigateMainMenu() {
   }
 }
 
-void displayHighScores() {
-
-}
-
-void displaySettings() {
+void displayMenu(String menu[]) {
   // display the items in the menu that are indicated by the array
   lcd.setCursor(0, 0);
   if (currentRow == 0) {
     lcd.write(rightArrow);
     lcd.setCursor(1, 0);
+    currentItem = menu[displayedItems[0]];
   }
-
-  lcd.print(settings[displayedItems[0]]);
+  if (menu[displayedItems[0]].length() < 15) {
+    lcd.print(menu[displayedItems[0]]);
+  }
+  else {
+    lcd.print(scrollLCDLeft(menu[displayedItems[0]]));
+    delay(350);
+  }
 
   lcd.setCursor(0, 1);
   if (currentRow == 1) {
     lcd.write(rightArrow);
     lcd.setCursor(1, 1);
+    currentItem = menu[displayedItems[1]];
   }
 
-  lcd.print(settings[displayedItems[1]]);
-
+  if (menu[displayedItems[1]].length() < 15) {
+    lcd.print(menu[displayedItems[1]]);
+  }
+  else {
+    lcd.print(scrollLCDLeft(menu[displayedItems[1]]));
+    delay(350);
+  }
   // if i am on the last item of the menu, i display the arrow pointing upwards
   if (displayedItems[1] == 3) {
     lcd.setCursor(15, 0);
@@ -247,56 +263,24 @@ void displaySettings() {
   }
 }
 
-void displayAbout() {
-  lcd.setCursor(0, 0);
-  if (currentRow == 0) {
-    lcd.write(rightArrow);
-    lcd.setCursor(1, 0);
-  }
-
-  if (about[displayedItems[0]].length() > 15) {
-    lcd.print(scrollLCDLeft(about[displayedItems[0]]));
-    delay(350);
-  }
-  else {
-    lcd.print(about[displayedItems[0]]);
-  }
-
-
-  lcd.setCursor(0, 1);
-  if (currentRow == 1) {
-    lcd.write(rightArrow);
-    lcd.setCursor(1, 1);
-  }
-
-  if (about[displayedItems[1]].length() > 15) {
-    lcd.print(scrollLCDLeft(about[displayedItems[1]]));
-    delay(350);
-  }
-  else {
-    lcd.print(about[displayedItems[1]]);
-  }
-
-  // if i am on the last item of the menu, i display the arrow pointing upwards
-  if (displayedItems[1] == 3) {
-    lcd.setCursor(15, 0);
-    lcd.write(upArrow);
-  }
-  // if i am on the first item of the menu, i display the arrow pointing downwards
-  else if (displayedItems[0] == 0) {
-    lcd.setCursor(15, 1);
-    lcd.write(downArrow);
-  }
-  // i display both arrows to show the player that they can go either way
-  else {
-    lcd.setCursor(15, 0);
-    lcd.write(upArrow);
-    lcd.setCursor(15, 1);
-    lcd.write(downArrow);
-  }
+void setLCDContrast(String contrast) {
+  analogWrite(V0, contrast.toInt());
+  lcd.clear();
+  currentMenuToDisplay = "Settings";
 }
 
-void game() {
+void setLCDBrightness(String brightness) {
+  lcd.clear();
+  currentMenuToDisplay = "Settings";
+
+}
+
+void setMatrixBrightness(String brightness) {
+  lcd.clear();
+  currentMenuToDisplay = "Settings";
+}
+
+void initialliseGame() {
   gameStarted = !gameStarted;
   lcd.clear();
   lcd.print("Game Started");

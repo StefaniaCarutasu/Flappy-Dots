@@ -51,6 +51,17 @@ byte rightArrowByte[8] = {
   B01000
 };
 
+byte bird[8] = {
+  B00100,
+  B01010,
+  B01110,
+  B00100,
+  B01110,
+  B00010,
+  B00100,
+  B01000
+};
+
 const int downArrow = 0;
 const int upArrow = 1;
 const int rightArrow = 2;

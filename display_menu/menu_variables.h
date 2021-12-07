@@ -1,5 +1,9 @@
+using namespace std;
+
 // The message displayed before the menu
-const String greetingMessage = "Sssnake";
+const String greetingMessage = "Flappy Bird";
+
+
 
 // Main menu items
 String mainMenuItems[] = {
@@ -19,6 +23,8 @@ String availableMenues[] = {
 };
 
 String currentMenuToDisplay = "Main";
+String lastDisplayedMenu = "Main";
+String currentItem = "Start Game";
 
 int currentMenuItem = 0;
 int currentRow = 0;
@@ -34,11 +40,11 @@ String settings[] = {
   "Back"
 };
 
-int contrasts[3] = {100, 120, 140};
+String contrasts[] = {"100", "120", "140", "Back"};
 
 // About menu
 String about[] = {
-  "Sssnake",
+  greetingMessage,
   "Carutasu Stefania",
   "https://github.com/StefaniaCarutasu/Introduction-to-Robotics---Matrix-Project",
   "Back"
