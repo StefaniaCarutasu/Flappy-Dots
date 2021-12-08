@@ -30,4 +30,4 @@ A greeting containing the name of the game is displayed when the game is launche
 <br/>
 
 ## Setup picture
-![](https://github.com/StefaniaCarutasu/Introduction-to-Robotics---Matrix-Project/blob/main/setup_picture_phase1.jpeg)
+![](https://github.com/StefaniaCarutasu/Flappy-Dots/blob/main/setup_picture_phase1.jpeg)
