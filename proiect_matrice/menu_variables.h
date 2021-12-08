@@ -1,7 +1,7 @@
 using namespace std;
 
 // The message displayed before the menu
-const String greetingMessage = "Flappy Bird";
+const String greetingMessage = "Flappy Dots";
 
 
 

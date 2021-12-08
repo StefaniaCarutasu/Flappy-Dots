@@ -27,8 +27,27 @@ int wallSpacing = 4;
 // if during this interval the player hasn't moved the bird, it will decrease on position
 const int decreaseInterval = 2000;
 
+// variables for the obstacles
+// shape of the obstacle
 int obstacle[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+//position of the obstacle
 int obstacleColumn = 7;
-int lastMovedObstacle = 0;
+unsigned long lastMovedObstacle = 0;
 int moveObstacleInterval = 1000;
 int generated = 0;
+
+
+// variables for the player name
+int playerName[] = {0, 0, 0};
+
+char alphabet[] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
+
+bool enterName = false;
+bool changedName = true;
+
+int currentLetterColumn = 0;
+int currentLetterRow = 0;
+
+// i lock the letter i'm currently writting on
+bool lockedLetter = false;

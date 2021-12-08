@@ -5,6 +5,7 @@
 #include "matrix_variables.h";
 #include "menu_variables.h";
 #include "game_variables.h";
+#include "player_name_manipulation.h"
 
 void setup() {
   Serial.begin(9600);
@@ -44,20 +45,28 @@ void loop() {
     switchMenues();
   }
   else if (gameFinished == false) {
-    //updateByteMatrix();
-    displayCurrentLevel();
-    if (generated == 0) {
-      generateObstacle();
-      generated = 1;
-    }
-    moveObstacle();
-    moveBird();
-    autoDecreaseBird();
-    if (matrixChanged == true) {
-      // matrix display logic
-      updateMatrix();
-      matrixChanged = false;
-    }
+    gameLogic();
+  }
+  else if (enterName) {
+    navigateName();
+    enterPlayerName();
+  }
+}
+
+void gameLogic() {
+  //updateByteMatrix();
+  displayCurrentLevel();
+  if (generated == 0) {
+    generateObstacle();
+    generated = 1;
+  }
+  moveObstacle();
+  moveBird();
+  autoDecreaseBird();
+  if (matrixChanged == true) {
+    // matrix display logic
+    updateMatrix();
+    matrixChanged = false;
   }
 }
 
@@ -82,6 +91,9 @@ void checkSw() {
         resetMenuVariables();
       }
 
+    }
+    else if (enterName) {
+      lockedLetter != lockedLetter;
     }
   }
 
@@ -142,13 +154,13 @@ void switchMenues() {
     }
     displayMenu(about);
   }
-  //  else if (currentMenuToDisplay == "Start Game") {
-  //    // start the game
-  //    if (changedMenu) {
-  //      changedMenu = !changedMenu;
-  //    }
-  //    initialliseGame();
-  //  }
+  else if (currentMenuToDisplay == "Start Game") {
+    // start the game
+    if (changedMenu) {
+      changedMenu = !changedMenu;
+    }
+    initialliseGame();
+  }
   else if (currentMenuToDisplay == "LCD Constrast") {
     // dispay the settings menu
     if (changedMenu) {
@@ -302,7 +314,7 @@ void setLCDBrightness(String brightness) {
   if (brightness == "Low") {
     analogWrite(A, brightnessLCDValues[0]);
   }
-  else if (contrast == "Medium") {
+  else if (brightness == "Medium") {
     analogWrite(A, brightnessLCDValues[1]);
   }
   else {
@@ -324,7 +336,7 @@ void setMatrixBrightness(String brightness) {
   else {
     lc.setIntensity(0, brightnessMatrixValues[2]);
   }
-  
+
   currentMenuToDisplay = "Settings";
 }
 
@@ -393,7 +405,7 @@ void autoDecreaseBird() {
       xPos++;
     }
     else {
-      lostGameScreen();
+      finishedGameScreen("Fucking loser");
     }
     lastMoved = millis();
 
@@ -406,17 +418,13 @@ void autoDecreaseBird() {
 void generateObstacle() {
   matrixChanged = true;
   obstacleColumn = 7;
-  
-  int top = random(0, 5);
-  int bottom = random(0, matrixSize - top - 3);
-
-  for (int i = 0; i < top; i++) {
+  int spaceStart = random(0, 5);
+  for (int i = 0; i < spaceStart; i++) {
     obstacle[i] = 1;
   }
-  for (int i = 7; i > matrixSize - bottom; i--) {
+  for (int i = spaceStart + 3; i < matrixSize; i++) {
     obstacle[i] = 1;
   }
-
   for (int i = 0; i < matrixSize; i++) {
     matrix[i][obstacleColumn] = obstacle[i];
   }
@@ -430,24 +438,14 @@ void moveObstacle() {
     if (obstacleColumn == 0) {
       // if the bird touched the obstacle, game over
       if (obstacle[xPos] == 1) {
-        lostGameScreen();
+        finishedGameScreen("Fucking loser");
       }
-      // the bird avoided the obstacle
-      else {
-        for (int i = 0; i < matrixSize; i++) {
-          obstacle[i] = 0;
-          if (i != xPos) {
-            matrix[i][obstacleColumn] = 0;
-          }
+      for (int i = 0; i < matrixSize; i++) {
+        if (i != xPos) {
+          matrix[i][obstacleColumn] = 0;
         }
-        score += 1;
-        if (score == previousScore + 5) {
-          previousScore = score;
-          level += 1;
-          moveObstacleInterval -= 100;
-        }
-        generateObstacle();
       }
+      obstacleColumn--;
     }
 
     else {
@@ -455,9 +453,32 @@ void moveObstacle() {
         matrix[i][obstacleColumn] = 0;
       }
       obstacleColumn--;
-      for (int i = 0; i < matrixSize; i++) {
-        matrix[i][obstacleColumn] = obstacle[i];
+      if (obstacleColumn > -1) {
+        for (int i = 0; i < matrixSize; i++) {
+          if (i != xPos) {
+            matrix[i][obstacleColumn] = obstacle[i];
+          }
+          
+        }
       }
+      else {
+        // the bird avoided the obstacle
+        for (int i = 0; i < matrixSize; i++) {
+          obstacle[i] = 0;
+          matrix[i][obstacleColumn] = 0;
+        }
+        score += 1;
+        if (score == 10) {
+          finishedGameScreen("You're a star");
+        }
+        else if (score == previousScore + 5) {
+          previousScore = score;
+          level += 1;
+          moveObstacleInterval -= 100;
+        }
+        generateObstacle();
+      }
+
     }
 
     lastMovedObstacle = millis();
@@ -475,14 +496,86 @@ void displayCurrentLevel() {
   lcd.print(level);
 }
 
-void lostGameScreen() {
+void finishedGameScreen(String message) {
   lcd.clear();
   gameFinished = !gameFinished;
+
   lcd.setCursor(0, 0);
-  lcd.print("Fucking loser");
+  Serial.println(message);
+  lcd.print(message);
+
   lcd.setCursor(0, 1);
   String printScore = "Score: " + (char)score;
   lcd.print("Score:");
   lcd.setCursor(7, 1);
   lcd.print(score);
+
+  enterName = true;
+  currentRow = 0;
+  delay(5000);
+}
+
+void enterPlayerName() {
+  if (changedName) {
+    lcd.clear();
+    changedName = !changedName;
+  }
+
+  lcd.setCursor(0, 0);
+  lcd.print("Name: ");
+  lcd.setCursor(6, 0);
+  //lcd.cursor(currentLetterColumn);
+  for (int i = 0; i < 3; i++) {
+    lcd.print(alphabet[playerName[i]]);
+  }
+  lcd.setCursor(0, 1);
+  lcd.print("Set");
+}
+
+void navigateName() {
+  readJoystick();
+  // i am locked on one letter and i try to change it
+  if (lockedLetter) {
+    if (yValue > maxThreshold && joyMoved == false) {
+      joyMoved = !joyMoved;
+      currentLetterRow++;
+      if (currentLetterRow == 26) {
+        currentLetterRow = 0;
+      }
+      playerName[currentLetterColumn] = currentLetterRow;
+      changedName = !changedName;
+    }
+
+    if (yValue < minThreshold && joyMoved == false) {
+      joyMoved = !joyMoved;
+      currentLetterRow--;
+      if (currentLetterRow == 0) {
+        currentLetterRow = 25;
+      }
+      playerName[currentLetterColumn] = currentLetterRow;
+      changedName = !changedName;
+    }
+  }
+
+  else {
+    if (xValue > maxThreshold && joyMoved == false) {
+      joyMoved = !joyMoved;
+      currentLetterColumn++;
+      if (currentLetterColumn == 3) {
+        currentLetterColumn = 0;
+      }
+    }
+
+    if (xValue < minThreshold && joyMoved == false) {
+      joyMoved = !joyMoved;
+      currentLetterColumn--;
+      if (currentLetterColumn == 0) {
+        currentLetterColumn = 3;
+      }
+    }
+  }
+
+  if (minThreshold <= yValue && yValue <= maxThreshold) {
+    joyMoved = false;
+  }
 }
