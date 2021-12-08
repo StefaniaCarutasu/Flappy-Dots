@@ -11,10 +11,10 @@ void setup() {
   Serial.begin(9600);
 
   pinMode(V0, OUTPUT);
-  analogWrite(V0, 120);
+  analogWrite(V0, constrastValues[1]);
 
   pinMode(A, OUTPUT);
-  analogWrite(A, 128);
+  analogWrite(A, brightnessLCDValues[1]);
 
   lcd.createChar(0, downArrowByte);
   lcd.createChar(1, upArrowByte);
