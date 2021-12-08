@@ -9,18 +9,24 @@
 void setup() {
   Serial.begin(9600);
 
-  analogWrite(V0, contrasts[1].toInt());
+  pinMode(V0, OUTPUT);
+  analogWrite(V0, 120);
+
+  pinMode(A, OUTPUT);
+  analogWrite(A, 128);
 
   lcd.createChar(0, downArrowByte);
   lcd.createChar(1, upArrowByte);
   lcd.createChar(2, rightArrowByte);
+  lcd.createChar(3, heartByte);
+
 
   lcd.begin(16, 2);
   displayGreeting();
 
   // setup matrix
   lc.shutdown(0, false); // turn off power saving, enables display
-  lc.setIntensity(0, matrixBrightness); // sets brightness (0~15 possible values)
+  lc.setIntensity(0, brightnessMatrixValues[0]); // sets brightness (0~15 possible values)
   lc.clearDisplay(0);// clear screen
 
   // joystick setup
@@ -36,6 +42,22 @@ void loop() {
 
   if (!gameStarted) {
     switchMenues();
+  }
+  else if (gameFinished == false) {
+    //updateByteMatrix();
+    displayCurrentLevel();
+    if (generated == 0) {
+      generateObstacle();
+      generated = 1;
+    }
+    moveObstacle();
+    moveBird();
+    autoDecreaseBird();
+    if (matrixChanged == true) {
+      // matrix display logic
+      updateMatrix();
+      matrixChanged = false;
+    }
   }
 }
 
@@ -76,7 +98,7 @@ void displayGreeting() {
 }
 
 void resetMenuVariables() {
-  lcd.clear();
+  //lcd.clear();
   currentMenuItem = 0;
   currentRow = 0;
   displayedItems[0] = 0;
@@ -140,15 +162,14 @@ void switchMenues() {
       changedMenu = !changedMenu;
     }
 
-    //displayLCDBrightnessSettings();
+    displayMenu(brightnesses);
   }
   else if (currentMenuToDisplay == "Matrix Brightness") {
     // dispay the settings menu
     if (changedMenu) {
       changedMenu = !changedMenu;
     }
-    //currentSubmenu = "Matrix Brightness";
-    //displayMatrixBrightnessSettings();
+    displayMenu(brightnesses);
   }
   else if (currentMenuToDisplay == "Back") {
     // display the main menu
@@ -264,12 +285,29 @@ void displayMenu(String menu[]) {
 }
 
 void setLCDContrast(String contrast) {
-  analogWrite(V0, contrast.toInt());
+  if (contrast == "Low") {
+    analogWrite(V0, constrastValues[0]);
+  }
+  else if (contrast == "Medium") {
+    analogWrite(V0, constrastValues[1]);
+  }
+  else {
+    analogWrite(V0, constrastValues[2]);
+  }
   lcd.clear();
   currentMenuToDisplay = "Settings";
 }
 
 void setLCDBrightness(String brightness) {
+  if (brightness == "Low") {
+    analogWrite(A, brightnessLCDValues[0]);
+  }
+  else if (contrast == "Medium") {
+    analogWrite(A, brightnessLCDValues[1]);
+  }
+  else {
+    analogWrite(A, brightnessLCDValues[2]);
+  }
   lcd.clear();
   currentMenuToDisplay = "Settings";
 
@@ -277,13 +315,174 @@ void setLCDBrightness(String brightness) {
 
 void setMatrixBrightness(String brightness) {
   lcd.clear();
+  if (brightness == "Low") {
+    lc.setIntensity(0, brightnessMatrixValues[0]);
+  }
+  else if (brightness == "Medium") {
+    lc.setIntensity(0, brightnessMatrixValues[1]);
+  }
+  else {
+    lc.setIntensity(0, brightnessMatrixValues[2]);
+  }
+  
   currentMenuToDisplay = "Settings";
 }
+
+// game logic functions
 
 void initialliseGame() {
   gameStarted = !gameStarted;
   lcd.clear();
   lcd.print("Game Started");
   delay(2000);
+  matrix[xPos][yPos] = 1;
   lcd.clear();
+}
+
+void updateByteMatrix() {
+  for (int row = 0; row < matrixSize; row++) {
+    lc.setRow(0, row, matrixByte[row]);
+  }
+}
+
+void updateMatrix() {
+  for (int row = 0; row < matrixSize; row++) {
+    for (int col = 0; col < matrixSize; col++) {
+      lc.setLed(0, row, col, matrix[row][col]);
+    }
+  }
+}
+
+void moveBird() {
+  readJoystick();
+
+  xLastPos = xPos;
+  yLastPos = yPos;
+
+  if (yValue > maxThreshold && joyMoved == false) {
+    joyMoved = true;
+    lastMoved = millis();
+    if (xPos > 0) {
+      xPos--;
+    }
+  }
+
+  if (yValue < minThreshold && joyMoved == false) {
+    joyMoved = true;
+    lastMoved = millis();
+    if (xPos < 8) {
+      xPos++;
+    }
+  }
+
+  if (minThreshold <= yValue && yValue <= maxThreshold) {
+    joyMoved = false;
+  }
+  if (xPos != xLastPos) {
+    matrixChanged = true;
+    matrix[xLastPos][yLastPos] = 0;
+    matrix[xPos][yPos] = 1;
+  }
+
+}
+
+void autoDecreaseBird() {
+  if (millis() - lastMoved > decreaseInterval) {
+    xLastPos = xPos;
+    if (xPos < 7) {
+      xPos++;
+    }
+    else {
+      lostGameScreen();
+    }
+    lastMoved = millis();
+
+    matrixChanged = true;
+    matrix[xLastPos][yLastPos] = 0;
+    matrix[xPos][yPos] = 1;
+  }
+}
+
+void generateObstacle() {
+  matrixChanged = true;
+  obstacleColumn = 7;
+  
+  int top = random(0, 5);
+  int bottom = random(0, matrixSize - top - 3);
+
+  for (int i = 0; i < top; i++) {
+    obstacle[i] = 1;
+  }
+  for (int i = 7; i > matrixSize - bottom; i--) {
+    obstacle[i] = 1;
+  }
+
+  for (int i = 0; i < matrixSize; i++) {
+    matrix[i][obstacleColumn] = obstacle[i];
+  }
+}
+
+void moveObstacle() {
+  if (millis() - lastMovedObstacle > moveObstacleInterval) {
+    // it's time to move the obstacle one column towards the bird
+    matrixChanged = true;
+
+    if (obstacleColumn == 0) {
+      // if the bird touched the obstacle, game over
+      if (obstacle[xPos] == 1) {
+        lostGameScreen();
+      }
+      // the bird avoided the obstacle
+      else {
+        for (int i = 0; i < matrixSize; i++) {
+          obstacle[i] = 0;
+          if (i != xPos) {
+            matrix[i][obstacleColumn] = 0;
+          }
+        }
+        score += 1;
+        if (score == previousScore + 5) {
+          previousScore = score;
+          level += 1;
+          moveObstacleInterval -= 100;
+        }
+        generateObstacle();
+      }
+    }
+
+    else {
+      for (int i = 0; i < matrixSize; i++) {
+        matrix[i][obstacleColumn] = 0;
+      }
+      obstacleColumn--;
+      for (int i = 0; i < matrixSize; i++) {
+        matrix[i][obstacleColumn] = obstacle[i];
+      }
+    }
+
+    lastMovedObstacle = millis();
+  }
+}
+
+void displayCurrentLevel() {
+  if (level != previousLevel) {
+    previousLevel = level;
+    lcd.clear();
+  }
+  lcd.setCursor(0, 0);
+  lcd.print("Level: ");
+  lcd.setCursor(7, 0);
+  lcd.print(level);
+}
+
+void lostGameScreen() {
+  lcd.clear();
+  gameFinished = !gameFinished;
+  lcd.setCursor(0, 0);
+  lcd.print("Fucking loser");
+  lcd.setCursor(0, 1);
+  String printScore = "Score: " + (char)score;
+  lcd.print("Score:");
+  lcd.setCursor(7, 1);
+  lcd.print(score);
 }

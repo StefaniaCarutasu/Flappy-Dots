@@ -40,7 +40,12 @@ String settings[] = {
   "Back"
 };
 
-String contrasts[] = {"100", "120", "140", "Back"};
+String contrasts[] = {"Low", "Medium", "High", "Back"};
+int constrastValues[] = {110, 125, 140};
+
+String brightnesses[] = {"Low", "Medium", "High", "Back"};
+int brightnessLCDValues[] = {128, 140, 152};
+int brightnessMatrixValues[] = {2, 4, 6};
 
 // About menu
 String about[] = {
