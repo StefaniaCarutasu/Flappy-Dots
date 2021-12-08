@@ -13,6 +13,9 @@ const int d7 = 7;
 
 LiquidCrystal lcd(RS, enable, d4, d5, d6, d7);
 
+const int lcd_contrast_address = 1;
+const int lcd_brightness_address = 2;
+
 const int displayCols = 16;
 const int displayRows = 2;
 

@@ -12,9 +12,11 @@ void setup() {
 
   pinMode(V0, OUTPUT);
   analogWrite(V0, constrastValues[1]);
+  EEPROM.update(lcd_contrast_address, constrastValues[1]);
 
   pinMode(A, OUTPUT);
   analogWrite(A, brightnessLCDValues[1]);
+  EEPROM.update(lcd_brightness_address, brightnessLCDValues[1]);
 
   lcd.createChar(0, downArrowByte);
   lcd.createChar(1, upArrowByte);
@@ -28,6 +30,7 @@ void setup() {
   // setup matrix
   lc.shutdown(0, false); // turn off power saving, enables display
   lc.setIntensity(0, brightnessMatrixValues[0]); // sets brightness (0~15 possible values)
+  EEPROM.update(matrix_brightness_address, brightnessMatrixValues[1]);
   lc.clearDisplay(0);// clear screen
 
   // joystick setup
@@ -297,46 +300,66 @@ void displayMenu(String menu[]) {
 }
 
 void setLCDContrast(String contrast) {
+  int contrastValue;
+  
   if (contrast == "Low") {
-    analogWrite(V0, constrastValues[0]);
+    contrastValue = constrastValues[0];
+    
   }
   else if (contrast == "Medium") {
+    contrastValue = constrastValues[1];
     analogWrite(V0, constrastValues[1]);
+    
   }
   else {
-    analogWrite(V0, constrastValues[2]);
+    contrastValue = constrastValues[2];
   }
+  
+  analogWrite(V0, contrastValue);
+  EEPROM.update(lcd_contrast_address, contrastValue);
+  
   lcd.clear();
   currentMenuToDisplay = "Settings";
 }
 
 void setLCDBrightness(String brightness) {
+  int brightnessValue;
+  
   if (brightness == "Low") {
-    analogWrite(A, brightnessLCDValues[0]);
+    brightnessValue = brightnessLCDValues[0];
   }
   else if (brightness == "Medium") {
-    analogWrite(A, brightnessLCDValues[1]);
+    brightnessValue = brightnessLCDValues[1];
   }
   else {
-    analogWrite(A, brightnessLCDValues[2]);
+    brightnessValue = brightnessLCDValues[2];
   }
+  
+  analogWrite(A, brightnessValue);
+  EEPROM.update(lcd_brightness_address, brightnessValue);
+  
   lcd.clear();
   currentMenuToDisplay = "Settings";
 
 }
 
 void setMatrixBrightness(String brightness) {
-  lcd.clear();
+  int brightnessValue;
+  
   if (brightness == "Low") {
-    lc.setIntensity(0, brightnessMatrixValues[0]);
+    brightnessValue = brightnessMatrixValues[0];
   }
   else if (brightness == "Medium") {
-    lc.setIntensity(0, brightnessMatrixValues[1]);
+    brightnessValue = brightnessMatrixValues[1];
   }
   else {
-    lc.setIntensity(0, brightnessMatrixValues[2]);
+    brightnessValue = brightnessMatrixValues[2];
   }
 
+  lc.setIntensity(0, brightnessMatrixValues[2]);
+  EEPROM.update(matrix_brightness_address, brightnessValue);
+  
+  lcd.clear();
   currentMenuToDisplay = "Settings";
 }
 
