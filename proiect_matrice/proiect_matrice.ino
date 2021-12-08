@@ -5,18 +5,15 @@
 #include "matrix_variables.h";
 #include "menu_variables.h";
 #include "game_variables.h";
-#include "player_name_manipulation.h"
 
 void setup() {
   Serial.begin(9600);
 
   pinMode(V0, OUTPUT);
-  analogWrite(V0, constrastValues[1]);
-  EEPROM.update(lcd_contrast_address, constrastValues[1]);
+  analogWrite(V0, EEPROM.read(lcd_contrast_address));
 
   pinMode(A, OUTPUT);
-  analogWrite(A, brightnessLCDValues[1]);
-  EEPROM.update(lcd_brightness_address, brightnessLCDValues[1]);
+  analogWrite(A,  EEPROM.read(lcd_brightness_address));
 
   lcd.createChar(0, downArrowByte);
   lcd.createChar(1, upArrowByte);
@@ -29,8 +26,7 @@ void setup() {
 
   // setup matrix
   lc.shutdown(0, false); // turn off power saving, enables display
-  lc.setIntensity(0, brightnessMatrixValues[0]); // sets brightness (0~15 possible values)
-  EEPROM.update(matrix_brightness_address, brightnessMatrixValues[1]);
+  lc.setIntensity(0, EEPROM.read(matrix_brightness_address)); // sets brightness (0~15 possible values)
   lc.clearDisplay(0);// clear screen
 
   // joystick setup
@@ -562,7 +558,7 @@ void navigateName() {
     if (yValue > maxThreshold && joyMoved == false) {
       joyMoved = !joyMoved;
       currentLetterRow++;
-      if (currentLetterRow == 26) {
+      if (currentLetterRow == alphabetLength) {
         currentLetterRow = 0;
       }
       playerName[currentLetterColumn] = currentLetterRow;
@@ -573,7 +569,7 @@ void navigateName() {
       joyMoved = !joyMoved;
       currentLetterRow--;
       if (currentLetterRow == 0) {
-        currentLetterRow = 25;
+        currentLetterRow = alphabetLength - 1;
       }
       playerName[currentLetterColumn] = currentLetterRow;
       changedName = !changedName;

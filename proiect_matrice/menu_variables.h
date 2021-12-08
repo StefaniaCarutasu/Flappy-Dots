@@ -3,8 +3,6 @@ using namespace std;
 // The message displayed before the menu
 const String greetingMessage = "Flappy Dots";
 
-
-
 // Main menu items
 String mainMenuItems[] = {
   "Start Game",
@@ -24,7 +22,7 @@ String availableMenues[] = {
 
 String currentMenuToDisplay = "Main";
 String lastDisplayedMenu = "Main";
-String currentItem = "Start Game";
+String currentItem = "";
 
 int currentMenuItem = 0;
 int currentRow = 0;

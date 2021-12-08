@@ -1,5 +1,5 @@
 // General game variables
-bool gameStarted = true;
+bool gameStarted = false;
 bool gameFinished = false;
 
 int previousLevel = 1;
@@ -41,6 +41,7 @@ int generated = 0;
 // variables for the player name
 int playerName[] = {0, 0, 0};
 
+const int alphabetLength = 26;
 char alphabet[] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
 
 bool enterName = false;
