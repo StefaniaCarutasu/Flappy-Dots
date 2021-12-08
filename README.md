@@ -3,7 +3,7 @@
 
 ## Requirements
 
-Flappy Bird game adaptation. 
+Flappy Bird game adaptation using Arduino Uno. 
 The menu of the game is displayed on a Liquid Crystal Display. The main menu contains the Start Game, Settings, Highest Scores and About sections. 
 The game is played on a 8x8 matrix.
 The navigation in the menu and playing the game are possible using a joystick. 
