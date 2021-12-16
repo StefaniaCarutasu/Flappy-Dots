@@ -8,7 +8,7 @@
 #include "highscore.h";
 
 
-void setup() {  
+void setup() {
   Serial.begin(9600);
   pinMode(V0, OUTPUT);
   EEPROM.update(lcd_contrast_address, 50);
@@ -139,7 +139,7 @@ String scrollLCDLeft(String toBeDisplayed) {
 
 void displayStartGameMessage() {
   lcd.clear();
-  String message = "Game Started";  
+  String message = "Game Started";
   int initialPos;
   initialPos = (displayCols - message.length()) / 2;
   lcd.setCursor(initialPos, 0);
@@ -511,9 +511,15 @@ void moveObstacle() {
       obstacleColumn--;
       if (obstacleColumn > -1) {
         for (int i = 0; i < matrixSize; i++) {
-          if (i != xPos) {
+          if (obstacleColumn != 0) {
             matrix[i][obstacleColumn] = obstacle[i];
           }
+          else {
+            if (i != xPos) {
+              matrix[i][obstacleColumn] = obstacle[i];
+            }
+          }
+          //matrix[i][obstacleColumn] = obstacle[i];
 
         }
       }
@@ -581,7 +587,7 @@ void displayEndGameStatistics() {
   lcd.print(score);
 
   delay(5000);
-  lcd.clear();  
+  lcd.clear();
 
   int compareResult = compareScores(score);
   if ( compareResult > -1) {
@@ -590,14 +596,14 @@ void displayEndGameStatistics() {
     currentRow = 0;
     joyMoved = false;
   }
-  else { 
+  else {
     resetGame();
   }
-  
+
 }
 
 void enterPlayerName() {
-  
+
   if (changedName) {
     lcd.clear();
     changedName = false;
