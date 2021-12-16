@@ -536,7 +536,7 @@ void moveObstacle() {
           //finishedGameScreen("You're a star");
         }
         else if (score == previousScore + 5) {
-          previousScore = score;
+          //previousScore = score;
           level += 1;
           moveObstacleInterval -= 100;
         }
@@ -550,7 +550,8 @@ void moveObstacle() {
 }
 
 void displayCurrentLevel() {
-  if (level != previousLevel) {
+  if (level != previousLevel || score != previousScore) {
+    previousScore = score;
     previousLevel = level;
     lcd.clear();
   }
@@ -558,6 +559,12 @@ void displayCurrentLevel() {
   lcd.print("Level: ");
   lcd.setCursor(7, 0);
   lcd.print(level);
+
+  lcd.setCursor(0, 1);
+  lcd.print("Score: ");
+  lcd.setCursor(7, 1);
+  lcd.print(score);
+  
 }
 
 void finishedGameScreen(String message) {
@@ -638,7 +645,7 @@ void navigateName() {
       if (currentLetter < 0) {
         currentLetter = alphabetLength - 1;
       }
-      Serial.println(alphabet[currentLetter]);
+      
       playerName[currentLetterPosition] = currentLetter;
 
       changedName = true;
