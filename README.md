@@ -29,5 +29,8 @@ A greeting containing the name of the game is displayed when the game is launche
 
 <br/>
 
-## Setup picture
-![](https://github.com/StefaniaCarutasu/Flappy-Dots/blob/main/setup_picture_phase1.jpeg)
+## Setup picture phase 1
+![](https://github.com/StefaniaCarutasu/Flappy-Dots/blob/main/setup_pictures/setup_picture_phase1.jpeg)
+
+## Setup picture phase 2
+![](https://github.com/StefaniaCarutasu/Flappy-Dots/blob/main/setup_pictures/setup_picture_phase2.jpeg)
