@@ -25,9 +25,6 @@ class MusicalNotes:
         wav_wave = np.array(tone, dtype=np.int16)
         sd.play(wav_wave, blocking=True)
         sd.stop()
-        new_wav = np.concatenate((wav_wave, wav_wave), axis=0)
-
-        return wav_wave
 
     def getTone(self):
         sd.default.samplerate = self.sampling_rate
