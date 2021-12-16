@@ -177,6 +177,7 @@ void switchMenues() {
   else if (currentMenuToDisplay == "Start Game") {
     // start the game
     if (changedMenu) {
+      lcd.clear();
       changedMenu = !changedMenu;
     }
     SYSTEM_STATE = START_GAME_SCREEN;
@@ -637,7 +638,8 @@ void navigateName() {
       if (currentLetter < 0) {
         currentLetter = alphabetLength - 1;
       }
-      playerName[currentLetterPosition] = alphabet[currentLetter];
+      Serial.println(alphabet[currentLetter]);
+      playerName[currentLetterPosition] = currentLetter;
 
       changedName = true;
     }
@@ -647,7 +649,7 @@ void navigateName() {
       if (currentLetter == alphabetLength) {
         currentLetter = 0;
       }
-      playerName[currentLetterPosition] = alphabet[currentLetter];
+      playerName[currentLetterPosition] = currentLetter;
 
       changedName = true;
     }
