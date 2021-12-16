@@ -62,7 +62,7 @@ void loop() {
     finishedGameScreen("You big loser...");
   }
   else if (SYSTEM_STATE == NAME_UPDATE_SCREEN) {
-    // TODO
+    navigateName();
   }
 }
 
@@ -583,7 +583,8 @@ void displayEndGameStatistics() {
   delay(5000);
   lcd.clear();  
 
-  if ( compareScores > -1) {
+  int compareResult = compareScores(score);
+  if ( compareResult > -1) {
     SYSTEM_STATE = NAME_UPDATE_SCREEN;
     enterName = true;
     currentRow = 0;
@@ -696,10 +697,8 @@ void setName() {
     newName += alphabet[playerName[i]];
   }
   int newRank = compareScores(score);
-  if (newRank > 0) {
-    shiftScores(newName, score, newRank);
-    updateEEPROM();
-  }
+  shiftScores(newName, score, newRank);
+  updateEEPROM();
   resetGame();
 }
 
@@ -734,6 +733,7 @@ void resetGame() {
   lastDisplayedMenu = "Main";
   currentItem = "";
 
+  getHighScores();
 
   resetMenuVariables();
   resetMatrix();

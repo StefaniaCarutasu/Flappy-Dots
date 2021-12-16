@@ -81,6 +81,7 @@ void shiftScores(String player, int score, int pos) {
     highscoreValues[2] = highscoreValues[1];
   }
 
+  Serial.println(score);
   highscoreNames[pos] = player;
   highscoreValues[pos] = score;
 }
