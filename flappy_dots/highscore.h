@@ -20,15 +20,15 @@ void writeIntIntoEEPROM(int address, int number)
 {
   byte byte1 = number >> 8;
   byte byte2 = number & 0xFF;
-  EEPROM.write(address, byte1);
-  EEPROM.write(address + 1, byte2);
+  EEPROM.update(address, byte1);
+  EEPROM.update(address + 1, byte2);
 }
 
 int readIntFromEEPROM(int address)
 {
   byte byte1 = EEPROM.read(address);
   byte byte2 = EEPROM.read(address + 1);
-  return (byte1 << 8) + byte2;
+  return (int)((byte1 << 8) + byte2);
 }
 
 void getHighScores() {
@@ -48,6 +48,7 @@ void getHighScores() {
   current = 0;
   for (int i = 0; i < 3; i++ ) {
     highscoreValues[current] = readIntFromEEPROM(scoresAddresses[i]);
+    current++;
 
   }
 
@@ -74,11 +75,11 @@ void shiftScores(String player, int score, int pos) {
     highscoreValues[2] = highscoreValues[1];
   }
   else if (pos == 0) {
-    highscoreNames[1] = highscoreNames[0];
-    highscoreValues[1] = highscoreValues[0];
-
     highscoreNames[2] = highscoreNames[1];
     highscoreValues[2] = highscoreValues[1];
+    
+    highscoreNames[1] = highscoreNames[0];
+    highscoreValues[1] = highscoreValues[0];   
   }
 
   Serial.println(score);
