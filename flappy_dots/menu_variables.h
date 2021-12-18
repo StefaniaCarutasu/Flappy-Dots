@@ -1,8 +1,4 @@
-using namespace std;
-
-// The message displayed before the menu
-const String greetingMessage = "Flappy Dots";
-
+#include "messages.h"
 // Main menu items
 String mainMenuItems[] = {
   "Start Game",

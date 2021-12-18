@@ -56,10 +56,10 @@ void loop() {
     gameLogic();
   }
   else if (SYSTEM_STATE == GAME_WON_SCREEN) {
-    finishedGameScreen("You're a star!");
+    finishedGameScreen(gameWonMessage);
   }
   else if (SYSTEM_STATE == GAME_LOST_SCREEN) {
-    finishedGameScreen("You big loser...");
+    finishedGameScreen(gameLostMessage);
   }
   else if (SYSTEM_STATE == NAME_UPDATE_SCREEN) {
     navigateName();
@@ -520,7 +520,6 @@ void moveObstacle() {
               matrix[i][obstacleColumn] = obstacle[i];
             }
           }
-          //matrix[i][obstacleColumn] = obstacle[i];
 
         }
       }
@@ -533,7 +532,6 @@ void moveObstacle() {
         score += 1;
         if (score == 10) {
           SYSTEM_STATE = GAME_WON_SCREEN;
-          //finishedGameScreen("You're a star");
         }
         else if (score == previousScore + 5) {
           //previousScore = score;
@@ -582,6 +580,22 @@ void finishedGameScreen(String message) {
   displayEndGameStatistics();
 }
 
+void congratulationScreen() {
+  lcd.clear(); 
+  int start = (displayCols - congratulationMessage.length()) / 2;
+  lcd.setCursor(start, 0);
+  lcd. print(congratulationMessage);
+
+  start = (displayCols - newHighscoreMessage.length()) / 2;
+  lcd.setCursor(start, 1);
+  lcd. print(newHighscoreMessage);
+
+  delay(2000);
+
+  lcd.clear();
+  
+}
+
 void displayEndGameStatistics() {
 
   lcd.setCursor(0, 0);
@@ -599,6 +613,8 @@ void displayEndGameStatistics() {
 
   int compareResult = compareScores(score);
   if ( compareResult > -1) {
+    congratulationScreen();
+      
     SYSTEM_STATE = NAME_UPDATE_SCREEN;
     enterName = true;
     currentRow = 0;
@@ -735,6 +751,10 @@ void resetGame() {
 
   for (int i = 0; i < 3; i++) {
     playerName[i] = 0;
+  }
+
+  for (int i = 0; i < 8; i++) {
+    obstacle[i] = 0;
   }
 
   changedName = true;
