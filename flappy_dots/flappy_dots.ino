@@ -11,7 +11,6 @@
 void setup() {
   Serial.begin(9600);
   pinMode(V0, OUTPUT);
-  EEPROM.update(lcd_contrast_address, 50);
   analogWrite(V0, EEPROM.read(lcd_contrast_address));
 
   pinMode(A, OUTPUT);
@@ -22,7 +21,7 @@ void setup() {
   lcd.createChar(2, rightArrowByte);
   lcd.createChar(3, heartByte);
 
-  lcd.begin(16, 2);
+  lcd.begin(displayCols, displayRows);
 
   // setup matrix
   lc.shutdown(0, false); // turn off power saving, enables display
@@ -554,14 +553,22 @@ void displayCurrentLevel() {
     lcd.clear();
   }
   lcd.setCursor(0, 0);
-  lcd.print("Level: ");
-  lcd.setCursor(7, 0);
-  lcd.print(level);
-
+  String levelToDisplay = displayLevel + String(level); 
+  lcd.print(levelToDisplay);
+  
   lcd.setCursor(0, 1);
-  lcd.print("Score: ");
-  lcd.setCursor(7, 1);
-  lcd.print(score);
+  String scoreToDisplay = displayScore + String(score);
+  lcd.print(scoreToDisplay);
+  
+//  lcd.setCursor(0, 0);
+//  lcd.print(displayLevel);
+//  lcd.setCursor(7, 0);
+//  lcd.print(level);
+//
+//  lcd.setCursor(0, 1);
+//  lcd.print(displayScore);
+//  lcd.setCursor(7, 1);
+//  lcd.print(score);
   
 }
 
@@ -599,14 +606,20 @@ void congratulationScreen() {
 void displayEndGameStatistics() {
 
   lcd.setCursor(0, 0);
-  lcd.print("LEVEL: ");
-  lcd.setCursor(8, 0);
-  lcd.print(level);
-
+  lcd.print("Your statistics:");
+  
   lcd.setCursor(0, 1);
-  lcd.print("SCORE: ");
-  lcd.setCursor(8, 1);
-  lcd.print(score);
+  String statistics = displayLevel + String(level) + "; " + displayScore + String(score);
+  lcd.print(scrollLCDLeft(statistics));
+  
+//  lcd.print(displayLevel);
+//  lcd.setCursor(8, 0);
+//  lcd.print(level);
+//
+//  lcd.setCursor(0, 1);
+//  lcd.print(displayScore);
+//  lcd.setCursor(8, 1);
+//  lcd.print(score);
 
   delay(5000);
   lcd.clear();
@@ -633,12 +646,26 @@ void enterPlayerName() {
     changedName = false;
   }
 
-  lcd.setCursor(0, 0);
-  lcd.print("Name: ");
-  lcd.setCursor(6, 0);
-  for (int i = 0; i < 3; i++) {
-    lcd.print(alphabet[playerName[i]]);
+  if (currentRow == 0) {
+    lcd.setCursor(0, 0);
+    lcd.write(rightArrow);
+    
+    lcd.setCursor(1, 0);
+    lcd.print("Name: ");
+    lcd.setCursor(7, 0);
+    for (int i = 0; i < 3; i++) {
+      lcd.print(alphabet[playerName[i]]);
+    }
   }
+  else {
+    lcd.setCursor(0, 0);
+    lcd.print("Name: ");
+    lcd.setCursor(6, 0);
+    for (int i = 0; i < 3; i++) {
+      lcd.print(alphabet[playerName[i]]);
+    }
+  }
+
   if (currentRow == 1) {
     lcd.setCursor(0, 1);
     lcd.write(rightArrow);
