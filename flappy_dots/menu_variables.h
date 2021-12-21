@@ -29,7 +29,6 @@ String settings[] = {
 String contrasts[] = {"Low", "Medium", "High", "Back"};
 int constrastValues[] = {30, 50, 70};
 
-String brightnesses[] = {"Low", "Medium", "High", "Back"};
 int brightnessLCDValues[] = {128, 140, 152};
 int brightnessMatrixValues[] = {2, 4, 6};
 

@@ -1,8 +1,8 @@
-int SYSTEM_STATE = 0;
-const int OPENING_SCREEN = 0;
-const int MENU_SCREEN = 1;
-const int START_GAME_SCREEN = 2;
-const int IN_GAME_SCREEN = 3;
-const int GAME_WON_SCREEN = 4;
-const int GAME_LOST_SCREEN = 5;
-const int NAME_UPDATE_SCREEN = 6;
+int SYSTEM_STATE = 0; 
+#define OPENING_SCREEN 0
+#define MENU_SCREEN 1
+#define START_GAME_SCREEN 2
+#define IN_GAME_SCREEN 3
+#define GAME_WON_SCREEN 4
+#define GAME_LOST_SCREEN 5
+#define NAME_UPDATE_SCREEN 6

@@ -34,7 +34,8 @@ void setup() {
 
   pinMode(pinX, INPUT);
   pinMode(pinY, INPUT);
-
+  
+  resetScores();
   getHighScores();
 }
 
@@ -55,6 +56,7 @@ void loop() {
     gameLogic();
   }
   else if (SYSTEM_STATE == GAME_WON_SCREEN) {
+    
     finishedGameScreen(gameWonMessage);
   }
   else if (SYSTEM_STATE == GAME_LOST_SCREEN) {
@@ -106,7 +108,7 @@ void checkSw() {
 void displayGreeting() {
   displayInitialAnimation();
   int initialPos;
-  initialPos = (displayCols - greetingMessage.length()) / 2;
+  initialPos = (displayCols - sizeof(greetingMessage)) / 2;
   lcd.setCursor(initialPos, 0);
   lcd.print(greetingMessage);
   delay(5000);
@@ -140,7 +142,7 @@ String scrollLCDLeft(String toBeDisplayed) {
 void displayStartGameMessage() {
   lcd.clear();  
   int initialPos;
-  initialPos = (displayCols - gameStartedMessage.length()) / 2;
+  initialPos = (displayCols - sizeof(gameStartedMessage)) / 2;
   lcd.setCursor(initialPos, 0);
   lcd.print(gameStartedMessage);
   delay(5000);
@@ -194,14 +196,14 @@ void switchMenues() {
       changedMenu = !changedMenu;
     }
 
-    displayMenu(brightnesses);
+    displayMenu(contrasts);
   }
   else if (currentMenuToDisplay == "Matrix Brightness") {
     // dispay the settings menu
     if (changedMenu) {
       changedMenu = !changedMenu;
     }
-    displayMenu(brightnesses);
+    displayMenu(contrasts);
   }
   else if (currentMenuToDisplay == "Back") {
     // display the main menu
@@ -223,8 +225,6 @@ void switchMenues() {
     displayMenu(mainMenuItems);
   }
 }
-
-
 
 void navigateMainMenu() {
   // go upwards
@@ -424,6 +424,14 @@ void displayInitialAnimation() {
   }
 }
 
+void displayTrophyAnimation() {
+   for (int row = 0; row < matrixSize; row++) {
+    for (int col = 0; col < matrixSize; col++) {
+      lc.setLed(0, row, col, trophyAnimationMatrix[row][col]);
+    }
+  }
+}
+
 void copyBirdPosition() {
   for (int i = 0; i < maxBirdSize; i++) {
     for (int j = 0; j < maxBirdSize; j++) {
@@ -611,6 +619,19 @@ void finishedGameScreen(String message) {
   displayEndGameStatistics();
 }
 
+void displayCongrats() {
+  lcd.clear();
+  lcd.setCursor(0, 0); 
+  lcd.print(congratulationMessage);
+
+  lcd.setCursor(0, 1); 
+  lcd.print(newHighscoreMessage);
+
+  delay(3000);
+
+  lcd.clear();
+}
+
 void displayEndGameStatistics() {
 
   lcd.setCursor(0, 0);
@@ -632,6 +653,8 @@ void displayEndGameStatistics() {
 
   int compareResult = compareScores(score);
   if ( compareResult > -1) {
+    displayTrophyAnimation();
+    displayCongrats();
     SYSTEM_STATE = NAME_UPDATE_SCREEN;
     enterName = true;
     currentRow = 0;
@@ -798,6 +821,7 @@ void resetGame() {
 
   resetMenuVariables();
   resetMatrix();
+  displayInitialAnimation();
 }
 
 void resetMatrix() {
