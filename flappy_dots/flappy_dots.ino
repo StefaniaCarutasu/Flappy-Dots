@@ -402,14 +402,9 @@ void gameLogic() {
 
 void initialliseGame() {
   SYSTEM_STATE = IN_GAME_SCREEN;
-  matrix[xPos][yPos] = 1;
+  matrix[currentBirdPosition[0][0]][currentBirdPosition[0][1]] = 1;
+  matrix[currentBirdPosition[1][0]][currentBirdPosition[1][1]] = 1;
   lcd.clear();
-}
-
-void updateByteMatrix() {
-  for (int row = 0; row < matrixSize; row++) {
-    lc.setRow(0, row, matrixByte[row]);
-  }
 }
 
 void updateMatrix() {
@@ -420,53 +415,71 @@ void updateMatrix() {
   }
 }
 
+void copyBirdPosition() {
+  for (int i = 0; i < maxBirdSize; i++) {
+    for (int j = 0; j < maxBirdSize; j++) {
+      lastBirdPosition[i][j] = currentBirdPosition[i][j];
+    }
+  }
+}
+
+void updateBirdMatrix() {
+
+  matrix[lastBirdPosition[0][0]][lastBirdPosition[0][1]] = 0;
+  matrix[lastBirdPosition[1][0]][lastBirdPosition[1][1]] = 0;
+  
+  matrix[currentBirdPosition[0][0]][currentBirdPosition[0][1]] = 1;
+  matrix[currentBirdPosition[1][0]][currentBirdPosition[1][1]] = 1;
+}
+
 void moveBird() {
   readJoystick();
 
-  xLastPos = xPos;
-  yLastPos = yPos;
+  copyBirdPosition();
 
   if (yValue > maxThreshold && joyMoved == false) {
     joyMoved = true;
     lastMoved = millis();
-    xPos--;
-    if (xPos < 0) {
-      xPos = 0;
+    if (currentBirdPosition[1][0] > 0) {
+      birdMoved = 1;
+      currentBirdPosition[1][0]--;
+      currentBirdPosition[0][0]--;
     }
   }
 
   if (yValue < minThreshold && joyMoved == false) {
     joyMoved = true;
     lastMoved = millis();
-    xPos++;
-    if (xPos > matrixSize - 1){
-      xPos = matrixSize - 1;
+    if (currentBirdPosition[0][0] < matrixSize - 1) {
+      birdMoved = 1;
+      currentBirdPosition[1][0]++;
+      currentBirdPosition[0][0]++;
     }
   }
 
   if (minThreshold <= yValue && yValue <= maxThreshold) {
     joyMoved = false;
   }
-  if (xPos != xLastPos) {
+  if (birdMoved == 1) {
+    birdMoved = 0;
     matrixChanged = true;
-    matrix[xLastPos][yLastPos] = 0;
-    matrix[xPos][yPos] = 1;
+    updateBirdMatrix();
   }
 
 }
 
 void autoDecreaseBird() {
   if (millis() - lastMoved > decreaseInterval) {
-    xLastPos = xPos;
-    xPos++;
-    if (xPos == 8) {
+    copyBirdPosition();
+    currentBirdPosition[1][0]++;
+    currentBirdPosition[0][0]++;
+    if (currentBirdPosition[0][1] == 8) {
       SYSTEM_STATE = GAME_LOST_SCREEN;
     }
     lastMoved = millis();
 
     matrixChanged = true;
-    matrix[xLastPos][yLastPos] = 0;
-    matrix[xPos][yPos] = 1;
+    updateBirdMatrix();
   }
 }
 
@@ -494,7 +507,6 @@ void moveObstacle() {
       // if the bird touched the obstacle, game over
       if (obstacle[xPos] == 1) {
         SYSTEM_STATE = GAME_LOST_SCREEN;
-        //finishedGameScreen("You big loser...");
       }
       for (int i = 0; i < matrixSize; i++) {
         if (i != xPos) {
