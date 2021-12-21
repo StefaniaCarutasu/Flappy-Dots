@@ -8,15 +8,6 @@ String mainMenuItems[] = {
   "About"
 };
 
-String availableMenues[] = {
-  "Start Game",
-  "Main",
-  "High Scores",
-  "Settings",
-  "About",
-  "Back"
-};
-
 String currentMenuToDisplay = "Main";
 String lastDisplayedMenu = "Main";
 String currentItem = "";

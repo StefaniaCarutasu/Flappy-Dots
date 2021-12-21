@@ -14,8 +14,6 @@ String scores[] = {
   "Back"
 };
 
-
-
 void writeIntIntoEEPROM(int address, int number)
 {
   byte byte1 = number >> 8;
