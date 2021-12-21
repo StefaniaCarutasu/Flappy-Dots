@@ -1,4 +1,5 @@
-#include "messages.h"
+#include "messages.h";
+
 // Main menu items
 String mainMenuItems[] = {
   "Start Game",

@@ -4,6 +4,7 @@ bool gameFinished = false;
 
 int previousLevel = 1;
 int level = 1;
+int changeLevelScore = 0;
 int previousScore = 0;
 int score = 0;
 
@@ -24,7 +25,7 @@ int xLastPos;
 int yLastPos; 
 
 // if during this interval the player hasn't moved the bird, it will decrease on position
-int decreaseInterval = 2000;
+int decreaseInterval = 500;
 
 // variables for the obstacles
 // shape of the obstacle
@@ -33,7 +34,7 @@ int obstacle[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 //position of the obstacle
 int obstacleColumn = 7;
 unsigned long lastMovedObstacle = 0;
-int moveObstacleInterval = 1000;
+int moveObstacleInterval = 500;
 int generated = 0;
 
 

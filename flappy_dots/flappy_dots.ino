@@ -21,7 +21,7 @@ void setup() {
   lcd.createChar(2, rightArrowByte);
   lcd.createChar(3, heartByte);
 
-  lcd.begin(displayCols, displayRows);
+  lcd.begin(16, 2);
 
   // setup matrix
   lc.shutdown(0, false); // turn off power saving, enables display
@@ -429,16 +429,18 @@ void moveBird() {
   if (yValue > maxThreshold && joyMoved == false) {
     joyMoved = true;
     lastMoved = millis();
-    if (xPos > 0) {
-      xPos--;
+    xPos--;
+    if (xPos < 0) {
+      xPos = 0;
     }
   }
 
   if (yValue < minThreshold && joyMoved == false) {
     joyMoved = true;
     lastMoved = millis();
-    if (xPos < 8) {
-      xPos++;
+    xPos++;
+    if (xPos > matrixSize - 1){
+      xPos = matrixSize - 1;
     }
   }
 
@@ -456,10 +458,8 @@ void moveBird() {
 void autoDecreaseBird() {
   if (millis() - lastMoved > decreaseInterval) {
     xLastPos = xPos;
-    if (xPos < 7) {
-      xPos++;
-    }
-    else {
+    xPos++;
+    if (xPos == 8) {
       SYSTEM_STATE = GAME_LOST_SCREEN;
     }
     lastMoved = millis();
@@ -519,6 +519,7 @@ void moveObstacle() {
               matrix[i][obstacleColumn] = obstacle[i];
             }
           }
+          //matrix[i][obstacleColumn] = obstacle[i];
 
         }
       }
@@ -532,14 +533,13 @@ void moveObstacle() {
         if (score == 10) {
           SYSTEM_STATE = GAME_WON_SCREEN;
         }
-        else if (score == previousScore + 5) {
-          //previousScore = score;
+        else if (score == changeLevelScore + 5) {
+          changeLevelScore = score;
           level += 1;
           moveObstacleInterval -= 100;
         }
         generateObstacle();
       }
-
     }
 
     lastMovedObstacle = millis();
@@ -547,28 +547,21 @@ void moveObstacle() {
 }
 
 void displayCurrentLevel() {
-  if (level != previousLevel || score != previousScore) {
+  if (score != previousScore) {
     previousScore = score;
+    lcd.clear();
+  }
+  if (level != previousLevel) {
     previousLevel = level;
     lcd.clear();
   }
+  String displayCurrentLevel = displayLevel + " " + String(level);
   lcd.setCursor(0, 0);
-  String levelToDisplay = displayLevel + String(level); 
-  lcd.print(levelToDisplay);
-  
+  lcd.print(displayCurrentLevel);
+
+  String displayCurrentScore = displayScore + " " + String(score);
   lcd.setCursor(0, 1);
-  String scoreToDisplay = displayScore + String(score);
-  lcd.print(scoreToDisplay);
-  
-//  lcd.setCursor(0, 0);
-//  lcd.print(displayLevel);
-//  lcd.setCursor(7, 0);
-//  lcd.print(level);
-//
-//  lcd.setCursor(0, 1);
-//  lcd.print(displayScore);
-//  lcd.setCursor(7, 1);
-//  lcd.print(score);
+  lcd.print(displayCurrentScore);
   
 }
 
@@ -587,47 +580,27 @@ void finishedGameScreen(String message) {
   displayEndGameStatistics();
 }
 
-void congratulationScreen() {
-  lcd.clear(); 
-  int start = (displayCols - congratulationMessage.length()) / 2;
-  lcd.setCursor(start, 0);
-  lcd. print(congratulationMessage);
-
-  start = (displayCols - newHighscoreMessage.length()) / 2;
-  lcd.setCursor(start, 1);
-  lcd. print(newHighscoreMessage);
-
-  delay(2000);
-
-  lcd.clear();
-  
-}
-
 void displayEndGameStatistics() {
-
+  
   lcd.setCursor(0, 0);
-  lcd.print("Your statistics:");
-  
-  lcd.setCursor(0, 1);
-  String statistics = displayLevel + String(level) + "; " + displayScore + String(score);
-  lcd.print(scrollLCDLeft(statistics));
-  
-//  lcd.print(displayLevel);
-//  lcd.setCursor(8, 0);
-//  lcd.print(level);
-//
-//  lcd.setCursor(0, 1);
-//  lcd.print(displayScore);
-//  lcd.setCursor(8, 1);
-//  lcd.print(score);
+  lcd.print(statisticsMessage);
 
+  lcd.setCursor(0, 1);
+
+  String statistics = displayLevel + level + "; " + displayScore + score;
+  if (statistics.length() > 16) {
+    lcd.print(scrollLCDLeft(statistics));
+    delay(350);
+  }
+  else {
+    lcd.print(statistics); 
+  }
+  
   delay(5000);
   lcd.clear();
 
   int compareResult = compareScores(score);
   if ( compareResult > -1) {
-    congratulationScreen();
-      
     SYSTEM_STATE = NAME_UPDATE_SCREEN;
     enterName = true;
     currentRow = 0;
@@ -636,7 +609,6 @@ void displayEndGameStatistics() {
   else {
     resetGame();
   }
-
 }
 
 void enterPlayerName() {
@@ -709,15 +681,15 @@ void navigateName() {
     // up-down motion means changing the row
     if (yValue < minThreshold && joyMoved == false) {
       joyMoved = !joyMoved;
-      if (currentRow == 1) {
-        currentRow = 0;
+      if (currentRow == 0) {
+        currentRow = 1;
       }
       changedName = true;
     }
     if (yValue > maxThreshold && joyMoved == false) {
       joyMoved = !joyMoved;
-      if (currentRow == 0) {
-        currentRow = 1;
+      if (currentRow == 1) {
+        currentRow = 0;
       }
       changedName = true;
     }
@@ -780,7 +752,7 @@ void resetGame() {
     playerName[i] = 0;
   }
 
-  for (int i = 0; i < 8; i++) {
+  for (int i = 0; i < matrixSize; i++) {
     obstacle[i] = 0;
   }
 

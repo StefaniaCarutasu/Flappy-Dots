@@ -7,14 +7,14 @@ int highscoreValues[3];
 int namesAddresses[3] = {4, 7, 10};
 int scoresAddresses[3] = {13, 15, 17};
 
-const int noOfScores = 3;
-
 String scores[] = {
   "",
   "",
   "",
   "Back"
 };
+
+
 
 void writeIntIntoEEPROM(int address, int number)
 {
@@ -36,9 +36,9 @@ void getHighScores() {
   int current = 0;
   String player;
 
-  for (int i = 0; i < noOfScores; i++) {
+  for (int i = 0; i < 3; i++) {
     player = "";
-    for (int j = namesAddresses[current]; j < namesAddresses[current] + noOfScores; j++) {
+    for (int j = namesAddresses[current]; j < namesAddresses[current] + 3; j++) {
       player += char(EEPROM.read(j));
     }
     highscoreNames[current] = String(player);
@@ -46,13 +46,13 @@ void getHighScores() {
   }
 
   current = 0;
-  for (int i = 0; i < noOfScores; i++ ) {
+  for (int i = 0; i < 3; i++ ) {
     highscoreValues[current] = readIntFromEEPROM(scoresAddresses[i]);
     current++;
 
   }
 
-  for (int i = 0; i < noOfScores; i++) {
+  for (int i = 0; i < 3; i++) {
     String newEntry = highscoreNames[i] + " " + String(highscoreValues[i]);
     scores[i] = newEntry;
     Serial.println(scores[i]);
@@ -87,29 +87,26 @@ void shiftScores(String player, int score, int pos) {
   highscoreValues[pos] = score;
 }
 
-
-
 void updateEEPROM() {
 
-  for (int i = 0; i < noOfScores; i++) {
+  for (int i = 0; i < 3; i++) {
     int k = 0;
-    for (int j = namesAddresses[i]; j < namesAddresses[i] + noOfScores; j++) {
+    for (int j = namesAddresses[i]; j < namesAddresses[i] + 3; j++) {
       EEPROM.update(j, highscoreNames[i][k]);
       k++;
     }
   }
 
-  for (int i = 0; i < noOfScores; i++) {
+  for (int i = 0; i < 3; i++) {
     writeIntIntoEEPROM(scoresAddresses[i], highscoreValues[i]);
   }
 }
 
 void resetScores() {
-  for (int i = 0; i < noOfScores; i++) {
+  for (int i = 0; i < 3; i++) {
     highscoreNames[i] = "aaa";
     highscoreValues[i] = 0;
   }
 
   updateEEPROM();
-  
 }
