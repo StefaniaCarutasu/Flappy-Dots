@@ -12,7 +12,7 @@ void setup() {
   //Serial.begin(9600);
   pinMode(V0, OUTPUT);
 
-  EEPROM.update(lcd_contrast_address, 50);
+  //EEPROM.update(lcd_contrast_address, 50);
   analogWrite(V0, EEPROM.read(lcd_contrast_address));
 
   pinMode(A, OUTPUT);
@@ -37,8 +37,8 @@ void setup() {
   pinMode(pinY, INPUT);
 
   noTone(buzzerPin);
+  playMusic = EEPROM.read(musicChoiceAddress);
 
-  //resetScores();
   getHighScores();
 
 }
@@ -46,17 +46,20 @@ void setup() {
 void loop() {
   readJoystick();
 
-  if (SYSTEM_STATE == OPENING_SCREEN) {   
+  if (SYSTEM_STATE == OPENING_SCREEN) {
     displayGreeting();
   }
   else if (SYSTEM_STATE == MENU_SCREEN) {
-    if (millis() - lastTone > toneInterval) {
-      if (note == 12) {
-        note = 0;
+    if (playMusic) {
+      if (millis() - lastTone > toneInterval) {
+        if (note == songLength) {
+          note = 0;
+        }
+        playMelody();
+        lastTone = millis();
       }
-      playMelody();
-      lastTone = millis();
     }
+
     switchMenues();
   }
   else if (SYSTEM_STATE == START_GAME_SCREEN) {
@@ -96,8 +99,18 @@ void checkSw() {
       else if (lastDisplayedMenu == "Mat. Bright.") {
         setMatrixBrightness(currentItem);
       }
-      else if (lastDisplayedMenu == "Reset Scores") {
+      if (currentItem == "Reset Scores") {
         resetScores();
+      }
+      else if (currentItem == "Sound Off") {
+        playMusic = 0;
+        settings[4] = "Sound On";
+        EEPROM.update(musicChoiceAddress, playMusic);
+      }
+      else if (currentItem == "Sound On") {
+        playMusic = 1;
+        settings[4] = "Sound Off";
+        EEPROM.update(musicChoiceAddress, playMusic);
       }
       lcd.clear();
       lastDisplayedMenu = currentMenuToDisplay;
@@ -282,9 +295,9 @@ void navigateMainMenu() {
     else {
       int noOfItems;
       if (currentMenuToDisplay == "Settings") {
-        noOfItems = 5;
+        noOfItems = 6;
       }
-      else{
+      else {
         noOfItems = 4;
       }
       if (currentMenuItem != noOfItems - 1) {
@@ -360,7 +373,7 @@ void setLCDContrast(String contrast) {
     contrastValue = constrastValues[1];
 
   }
-  else {
+  else if (contrast == "High") {
     contrastValue = constrastValues[2];
   }
 
@@ -380,7 +393,7 @@ void setLCDBrightness(String brightness) {
   else if (brightness == "Medium") {
     brightnessValue = brightnessLCDValues[1];
   }
-  else {
+  else if (brightness == "High") {
     brightnessValue = brightnessLCDValues[2];
   }
 
@@ -401,7 +414,7 @@ void setMatrixBrightness(String brightness) {
   else if (brightness == "Medium") {
     brightnessValue = brightnessMatrixValues[1];
   }
-  else {
+  else if (brightness == "High") {
     brightnessValue = brightnessMatrixValues[2];
   }
 
@@ -588,7 +601,6 @@ void moveObstacle() {
           matrix[i][obstacleColumn] = 0;
         }
       }
-
       obstacleColumn--;
     }
     else if (obstacleColumn == 0) {
@@ -602,8 +614,6 @@ void moveObstacle() {
       }
       obstacleColumn--;
     }
-
-
     else {
       for (int i = 0; i < matrixSize; i++) {
         matrix[i][obstacleColumn] = 0;

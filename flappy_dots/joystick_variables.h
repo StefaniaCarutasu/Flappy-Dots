@@ -12,5 +12,5 @@ bool joyMoved = false;
 #define maxThreshold 700
 
 // timers for the button
-#define debounceInterval 100
+#define debounceInterval 250
 int lastDebounceTime = 0;

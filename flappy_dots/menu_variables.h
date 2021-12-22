@@ -24,6 +24,7 @@ String settings[] = {
   "LCD Bright.",
   "Mat. Bright.",
   "Reset Scores",
+  "Sound Off",
   "Back"
 };
 
@@ -31,7 +32,7 @@ String contrasts[] = {"Low", "Medium", "High", "Back"};
 int constrastValues[] = {30, 50, 70};
 
 int brightnessLCDValues[] = {128, 140, 152};
-int brightnessMatrixValues[] = {2, 4, 6};
+int brightnessMatrixValues[] = {2, 5, 8};
 
 // About menu
 String about[] = {
