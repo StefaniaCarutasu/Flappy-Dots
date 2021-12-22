@@ -6,12 +6,12 @@
 #include "game_variables.h";
 
 #include "highscore.h";
-
+#include "buzzer_variables.h"
 
 void setup() {
-  Serial.begin(9600);
+  //Serial.begin(9600);
   pinMode(V0, OUTPUT);
-  
+
   EEPROM.update(lcd_contrast_address, 50);
   analogWrite(V0, EEPROM.read(lcd_contrast_address));
 
@@ -36,17 +36,27 @@ void setup() {
   pinMode(pinX, INPUT);
   pinMode(pinY, INPUT);
 
-  resetScores();
+  noTone(buzzerPin);
+
+  //resetScores();
   getHighScores();
+
 }
 
 void loop() {
   readJoystick();
 
-  if (SYSTEM_STATE == OPENING_SCREEN) {
+  if (SYSTEM_STATE == OPENING_SCREEN) {   
     displayGreeting();
   }
   else if (SYSTEM_STATE == MENU_SCREEN) {
+    if (millis() - lastTone > toneInterval) {
+      if (note == 12) {
+        note = 0;
+      }
+      playMelody();
+      lastTone = millis();
+    }
     switchMenues();
   }
   else if (SYSTEM_STATE == START_GAME_SCREEN) {
@@ -85,6 +95,9 @@ void checkSw() {
       }
       else if (lastDisplayedMenu == "Mat. Bright.") {
         setMatrixBrightness(currentItem);
+      }
+      else if (lastDisplayedMenu == "Reset Scores") {
+        resetScores();
       }
       lcd.clear();
       lastDisplayedMenu = currentMenuToDisplay;
@@ -267,7 +280,14 @@ void navigateMainMenu() {
       currentMenuItem += 1;
     }
     else {
-      if (currentMenuItem != 3) {
+      int noOfItems;
+      if (currentMenuToDisplay == "Settings") {
+        noOfItems = 5;
+      }
+      else{
+        noOfItems = 4;
+      }
+      if (currentMenuItem != noOfItems - 1) {
         currentRow = 1 - currentRow;
         displayedItems[0] += 1;
         displayedItems[1] += 1;
@@ -286,8 +306,6 @@ void displayMenu(String menu[]) {
   if (currentRow == 0) {
     lcd.write(rightArrow);
     lcd.setCursor(1, 0);
-    Serial.println(lastDisplayedMenu);
-    Serial.println(currentItem);
     currentItem = menu[displayedItems[0]];
   }
   if (menu[displayedItems[0]].length() < 15) {
@@ -302,8 +320,6 @@ void displayMenu(String menu[]) {
   if (currentRow == 1) {
     lcd.write(rightArrow);
     lcd.setCursor(1, 1);
-    Serial.println(lastDisplayedMenu);
-    Serial.println(currentItem);
     currentItem = menu[displayedItems[1]];
   }
 
@@ -334,8 +350,6 @@ void displayMenu(String menu[]) {
 }
 
 void setLCDContrast(String contrast) {
-
-  Serial.println(contrast);
   int contrastValue;
 
   if (contrast == "Low") {
@@ -349,8 +363,6 @@ void setLCDContrast(String contrast) {
   else {
     contrastValue = constrastValues[2];
   }
-
-  Serial.println(contrastValue);
 
   analogWrite(V0, contrastValue);
   EEPROM.update(lcd_contrast_address, contrastValue);

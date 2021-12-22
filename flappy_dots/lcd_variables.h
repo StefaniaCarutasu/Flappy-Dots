@@ -1,14 +1,14 @@
 #include<LiquidCrystal.h>
 
 // lcd variables
-const int A = 3;
+const int A = 4;
 const int V0 = 5;
 const int RS = 8;
 const int enable = 9;
 const int d4 = 7;
 const int d5 = 6;
 const int d6 = 13;
-const int d7 = 4;
+const int d7 = 3;
 
 
 LiquidCrystal lcd(RS, enable, d4, d5, d6, d7);
@@ -16,8 +16,8 @@ LiquidCrystal lcd(RS, enable, d4, d5, d6, d7);
 const int lcd_contrast_address = 1;
 const int lcd_brightness_address = 2;
 
-const int displayCols = 16;
-const int displayRows = 2;
+#define displayCols 16
+#define displayRows 2
 
 // down arrow
 byte downArrowByte[8] = {

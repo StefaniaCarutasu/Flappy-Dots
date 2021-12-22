@@ -8,9 +8,9 @@ int yValue = 0;
 
 bool joyMoved = false;
 
-const int minThreshold = 400;
-const int maxThreshold = 700;
+#define minThreshold 400
+#define maxThreshold 700
 
 // timers for the button
-const int debounceInterval = 100;
-unsigned long lastDebounceTime = 0;
+#define debounceInterval 100
+int lastDebounceTime = 0;

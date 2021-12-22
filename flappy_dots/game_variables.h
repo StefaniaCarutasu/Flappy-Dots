@@ -1,7 +1,3 @@
-// General game variables
-bool gameStarted = false;
-bool gameFinished = false;
-
 int previousLevel = 1;
 int level = 1;
 int changeLevelScore = 0;

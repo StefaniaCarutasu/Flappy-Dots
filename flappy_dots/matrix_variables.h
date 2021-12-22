@@ -13,7 +13,7 @@ const int matrix_brightness_address = 3;
 const byte moveInterval = 100;
 unsigned long long lastMoved = 0;
 
-const byte matrixSize = 8;
+#define matrixSize 8
 bool matrixChanged = true;
 
 bool matrix[matrixSize][matrixSize] = {

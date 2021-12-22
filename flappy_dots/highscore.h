@@ -53,7 +53,6 @@ void getHighScores() {
   for (int i = 0; i < 3; i++) {
     String newEntry = highscoreNames[i] + " " + String(highscoreValues[i]);
     scores[i] = newEntry;
-    Serial.println(scores[i]);
   }
 }
 
@@ -79,8 +78,7 @@ void shiftScores(String player, int score, int pos) {
     highscoreNames[1] = highscoreNames[0];
     highscoreValues[1] = highscoreValues[0];   
   }
-
-  Serial.println(score);
+  
   highscoreNames[pos] = player;
   highscoreValues[pos] = score;
 }

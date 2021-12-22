@@ -23,6 +23,7 @@ String settings[] = {
   "LCD Constrast",
   "LCD Bright.",
   "Mat. Bright.",
+  "Reset Scores",
   "Back"
 };
 
