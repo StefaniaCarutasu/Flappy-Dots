@@ -34,7 +34,7 @@ void setup() {
 
   pinMode(pinX, INPUT);
   pinMode(pinY, INPUT);
-  
+
   resetScores();
   getHighScores();
 }
@@ -43,7 +43,7 @@ void loop() {
   readJoystick();
 
   if (SYSTEM_STATE == OPENING_SCREEN) {
-    displayGreeting();    
+    displayGreeting();
   }
   else if (SYSTEM_STATE == MENU_SCREEN) {
     switchMenues();
@@ -56,7 +56,7 @@ void loop() {
     gameLogic();
   }
   else if (SYSTEM_STATE == GAME_WON_SCREEN) {
-    
+
     finishedGameScreen(gameWonMessage);
   }
   else if (SYSTEM_STATE == GAME_LOST_SCREEN) {
@@ -140,7 +140,7 @@ String scrollLCDLeft(String toBeDisplayed) {
 }
 
 void displayStartGameMessage() {
-  lcd.clear();  
+  lcd.clear();
   int initialPos;
   initialPos = (displayCols - sizeof(gameStartedMessage)) / 2;
   lcd.setCursor(initialPos, 0);
@@ -417,7 +417,7 @@ void updateMatrix() {
 }
 
 void displayInitialAnimation() {
-   for (int row = 0; row < matrixSize; row++) {
+  for (int row = 0; row < matrixSize; row++) {
     for (int col = 0; col < matrixSize; col++) {
       lc.setLed(0, row, col, birdAnimationMatrix[row][col]);
     }
@@ -425,7 +425,7 @@ void displayInitialAnimation() {
 }
 
 void displayTrophyAnimation() {
-   for (int row = 0; row < matrixSize; row++) {
+  for (int row = 0; row < matrixSize; row++) {
     for (int col = 0; col < matrixSize; col++) {
       lc.setLed(0, row, col, trophyAnimationMatrix[row][col]);
     }
@@ -515,11 +515,38 @@ void generateObstacle() {
   }
 }
 
+
+// shifts de obstacle up (shifts the space the bird can fly through)
+void shiftUp() {
+  int o = obstacle[0];
+  if (obstacle[0] == 0) {
+    o = 1;
+    obstacle[3] = 1;
+  }
+  for (int i = 0; i < matrixSize - 2; i++) {
+    obstacle[i] = obstacle[i + 1];
+  }
+  obstacle[matrixSize - 1] = o;
+}
+
+// shifts de obstacle down (shifts the space the bird can fly through)
+void shiftDown() {
+  int o = obstacle[matrixSize - 1];
+  if (obstacle[matrixSize - 1] == 0) {
+    o = 1;
+    obstacle[4] = 1;
+  }
+  for (int i = matrixSize - 1; i > 1; i--) {
+    obstacle[i] = obstacle[i - 1];
+  }
+  obstacle[0] = o;
+}
+
 void moveObstacle() {
   if (millis() - lastMovedObstacle > moveObstacleInterval) {
     // it's time to move the obstacle one column towards the bird
     matrixChanged = true;
-    
+
     if (obstacleColumn == 1) {
       if (obstacle[currentBirdPosition[1][0]] == 1) {
         SYSTEM_STATE = GAME_LOST_SCREEN;
@@ -529,6 +556,7 @@ void moveObstacle() {
           matrix[i][obstacleColumn] = 0;
         }
       }
+
       obstacleColumn--;
     }
     else if (obstacleColumn == 0) {
@@ -561,6 +589,27 @@ void moveObstacle() {
           }
 
         }
+        if (level > 4) {
+          if (level % 2) {
+            if (obstacleColumn % 2) {
+              shiftUp();
+            }
+            else {
+              shiftDown();
+            }
+          }
+          else {
+            if (obstacleColumn % 2) {
+              shiftDown();
+            }
+            else {
+              shiftUp();
+
+            }
+          }
+
+        }
+
       }
       else {
         // the bird avoided the obstacle
@@ -569,13 +618,16 @@ void moveObstacle() {
           matrix[i][obstacleColumn] = 0;
         }
         score += 1;
-        if (score == 10) {
+        if (score == 50) {
           SYSTEM_STATE = GAME_WON_SCREEN;
         }
         else if (score == changeLevelScore + 5) {
           changeLevelScore = score;
           level += 1;
-          moveObstacleInterval -= 100;
+          if (level <= 4) {
+            moveObstacleInterval -= 100;
+          }
+
         }
         generateObstacle();
       }
@@ -621,10 +673,10 @@ void finishedGameScreen(String message) {
 
 void displayCongrats() {
   lcd.clear();
-  lcd.setCursor(0, 0); 
+  lcd.setCursor(0, 0);
   lcd.print(congratulationMessage);
 
-  lcd.setCursor(0, 1); 
+  lcd.setCursor(0, 1);
   lcd.print(newHighscoreMessage);
 
   delay(3000);

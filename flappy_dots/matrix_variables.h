@@ -35,7 +35,7 @@ bool birdAnimationMatrix[matrixSize][matrixSize] = {
   {1, 1, 1, 0, 0, 1, 0, 0},
   {1, 0, 0, 0, 0, 1, 0, 0},
   {0, 1, 1, 1, 1, 0, 0, 0},
-  {0, 1, 0, 0, 1, 0, 0, 0}  
+  {0, 0, 0, 0, 0, 0, 0, 0}  
 };
 
 bool trophyAnimationMatrix[matrixSize][matrixSize] = {
