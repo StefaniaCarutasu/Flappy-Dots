@@ -11,6 +11,8 @@
 void setup() {
   Serial.begin(9600);
   pinMode(V0, OUTPUT);
+  
+  EEPROM.update(lcd_contrast_address, 50);
   analogWrite(V0, EEPROM.read(lcd_contrast_address));
 
   pinMode(A, OUTPUT);
@@ -19,7 +21,6 @@ void setup() {
   lcd.createChar(0, downArrowByte);
   lcd.createChar(1, upArrowByte);
   lcd.createChar(2, rightArrowByte);
-  lcd.createChar(3, heartByte);
 
   lcd.begin(16, 2);
 
@@ -79,10 +80,10 @@ void checkSw() {
       if (lastDisplayedMenu == "LCD Constrast") {
         setLCDContrast(currentItem);
       }
-      else if (lastDisplayedMenu == "LCD Brightness") {
+      else if (lastDisplayedMenu == "LCD Bright.") {
         setLCDBrightness(currentItem);
       }
-      else if (lastDisplayedMenu == "Matrix Brightness") {
+      else if (lastDisplayedMenu == "Mat. Bright.") {
         setMatrixBrightness(currentItem);
       }
       lcd.clear();
@@ -154,6 +155,7 @@ void switchMenues() {
   if (currentMenuToDisplay == "High Scores") {
     // dispay the high scores menu
     if (changedMenu) {
+      lastDisplayedMenu = currentMenuToDisplay;
       changedMenu = !changedMenu;
       lcd.clear();
     }
@@ -162,6 +164,7 @@ void switchMenues() {
   else if (currentMenuToDisplay == "Settings") {
     // dispay the settings menu
     if (changedMenu) {
+      lastDisplayedMenu = currentMenuToDisplay;
       changedMenu = !changedMenu;
       lcd.clear();
     }
@@ -170,6 +173,7 @@ void switchMenues() {
   else if (currentMenuToDisplay == "About") {
     // dispay the about menu
     if (changedMenu) {
+      lastDisplayedMenu = currentMenuToDisplay;
       changedMenu = !changedMenu;
       lcd.clear();
     }
@@ -178,6 +182,7 @@ void switchMenues() {
   else if (currentMenuToDisplay == "Start Game") {
     // start the game
     if (changedMenu) {
+      lastDisplayedMenu = currentMenuToDisplay;
       lcd.clear();
       changedMenu = !changedMenu;
     }
@@ -186,28 +191,35 @@ void switchMenues() {
   else if (currentMenuToDisplay == "LCD Constrast") {
     // dispay the settings menu
     if (changedMenu) {
+      lastDisplayedMenu = currentMenuToDisplay;
       changedMenu = !changedMenu;
+      lcd.clear();
     }
     displayMenu(contrasts);
   }
-  else if (currentMenuToDisplay == "LCD Brightness") {
+  else if (currentMenuToDisplay == "LCD Bright.") {
     // dispay the settings menu
     if (changedMenu) {
+      lastDisplayedMenu = currentMenuToDisplay;
       changedMenu = !changedMenu;
+      lcd.clear();
     }
 
     displayMenu(contrasts);
   }
-  else if (currentMenuToDisplay == "Matrix Brightness") {
+  else if (currentMenuToDisplay == "Mat. Bright.") {
     // dispay the settings menu
     if (changedMenu) {
+      lastDisplayedMenu = currentMenuToDisplay;
       changedMenu = !changedMenu;
+      lcd.clear();
     }
     displayMenu(contrasts);
   }
   else if (currentMenuToDisplay == "Back") {
     // display the main menu
     if (changedMenu) {
+      lastDisplayedMenu = currentMenuToDisplay;
       changedMenu = !changedMenu;
       lcd.clear();
     }
@@ -217,6 +229,7 @@ void switchMenues() {
   else {
     // display the main menu
     if (changedMenu) {
+      lastDisplayedMenu = currentMenuToDisplay;
       changedMenu = !changedMenu;
       lcd.clear();
     }
@@ -273,6 +286,8 @@ void displayMenu(String menu[]) {
   if (currentRow == 0) {
     lcd.write(rightArrow);
     lcd.setCursor(1, 0);
+    Serial.println(lastDisplayedMenu);
+    Serial.println(currentItem);
     currentItem = menu[displayedItems[0]];
   }
   if (menu[displayedItems[0]].length() < 15) {
@@ -287,6 +302,8 @@ void displayMenu(String menu[]) {
   if (currentRow == 1) {
     lcd.write(rightArrow);
     lcd.setCursor(1, 1);
+    Serial.println(lastDisplayedMenu);
+    Serial.println(currentItem);
     currentItem = menu[displayedItems[1]];
   }
 
@@ -317,6 +334,8 @@ void displayMenu(String menu[]) {
 }
 
 void setLCDContrast(String contrast) {
+
+  Serial.println(contrast);
   int contrastValue;
 
   if (contrast == "Low") {
@@ -325,12 +344,13 @@ void setLCDContrast(String contrast) {
   }
   else if (contrast == "Medium") {
     contrastValue = constrastValues[1];
-    analogWrite(V0, constrastValues[1]);
 
   }
   else {
     contrastValue = constrastValues[2];
   }
+
+  Serial.println(contrastValue);
 
   analogWrite(V0, contrastValue);
   EEPROM.update(lcd_contrast_address, contrastValue);

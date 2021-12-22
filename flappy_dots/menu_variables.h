@@ -21,8 +21,8 @@ bool changedMenu = false;
 // Submenues items
 String settings[] = {
   "LCD Constrast",
-  "LCD Brightness",
-  "Matrix Brightness",
+  "LCD Bright.",
+  "Mat. Bright.",
   "Back"
 };
 

@@ -303,9 +303,7 @@ void setLCDContrast(String contrast) {
     
   }
   else if (contrast == "Medium") {
-    contrastValue = constrastValues[1];
-    analogWrite(V0, constrastValues[1]);
-    
+    contrastValue = constrastValues[1];    
   }
   else {
     contrastValue = constrastValues[2];
