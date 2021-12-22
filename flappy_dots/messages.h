@@ -12,5 +12,6 @@
 const String displayLevel = "Level:";
 const String displayScore = "Score:";
 const String displayName = "Name: ";
+const String setCurrentName = "Set";
 
 #define statisticsMessage "Your statistics"

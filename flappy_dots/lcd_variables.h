@@ -72,5 +72,5 @@ const int rightArrow = 2;
 const int heart = 3;
 
 // Scrolling text variables
-int L1 = 15;
+int L1 = 14;
 int L11 = 0;

@@ -31,7 +31,7 @@ void setup() {
 
   // joystick setup
   pinMode(pinSW, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(pinSW), checkSw, FALLING);
+  attachInterrupt(digitalPinToInterrupt(pinSW), handleInterrupt, FALLING);
 
   pinMode(pinX, INPUT);
   pinMode(pinY, INPUT);
@@ -70,10 +70,10 @@ void loop() {
     gameLogic();
   }
   else if (SYSTEM_STATE == GAME_WON_SCREEN) {
-
     finishedGameScreen(gameWonMessage);
   }
   else if (SYSTEM_STATE == GAME_LOST_SCREEN) {
+    displayXAnimation();
     finishedGameScreen(gameLostMessage);
   }
   else if (SYSTEM_STATE == NAME_UPDATE_SCREEN) {
@@ -86,50 +86,53 @@ void readJoystick() {
   xValue = analogRead(pinX);
 }
 
+void handleInterrupt() {
+  unsigned long long current = millis();
+  if (current - lastDebounceTime > debounceInterval) {
+    lastDebounceTime = current;
+    checkSw();
+  }
+}
+
 void checkSw() {
-  // trying to eliminate the possible noise by waiting a few miliseconds before doing something
-  if (millis() - lastDebounceTime > debounceInterval) {
-    if (SYSTEM_STATE == MENU_SCREEN ) {
-      if (lastDisplayedMenu == "LCD Constrast") {
-        setLCDContrast(currentItem);
-      }
-      else if (lastDisplayedMenu == "LCD Bright.") {
-        setLCDBrightness(currentItem);
-      }
-      else if (lastDisplayedMenu == "Mat. Bright.") {
-        setMatrixBrightness(currentItem);
-      }
-      if (currentItem == "Reset Scores") {
-        resetScores();
-      }
-      else if (currentItem == "Sound Off") {
-        playMusic = 0;
-        settings[4] = "Sound On";
-        EEPROM.update(musicChoiceAddress, playMusic);
-      }
-      else if (currentItem == "Sound On") {
-        playMusic = 1;
-        settings[4] = "Sound Off";
-        EEPROM.update(musicChoiceAddress, playMusic);
-      }
-      lcd.clear();
-      lastDisplayedMenu = currentMenuToDisplay;
-      currentMenuToDisplay = currentItem;
-      changedMenu = !changedMenu;
-      resetMenuVariables();
+  if (SYSTEM_STATE == MENU_SCREEN ) {
+    if (lastDisplayedMenu == "LCD Constrast") {
+      setLCDContrast(currentItem);
     }
-    else if (SYSTEM_STATE == NAME_UPDATE_SCREEN) {
-      if (currentRow == 0) {
-        lockedLetter = !lockedLetter;
-        currentLetter = 0;
-      }
-      else {
-        setName();
-      }
+    else if (lastDisplayedMenu == "LCD Bright.") {
+      setLCDBrightness(currentItem);
+    }
+    else if (lastDisplayedMenu == "Mat. Bright.") {
+      setMatrixBrightness(currentItem);
+    }
+    if (currentItem == "Reset Scores") {
+      resetScores();
+    }
+    else if (currentItem == "Sound Off") {
+      playMusic = 0;
+      settings[4] = "Sound On";
+      EEPROM.update(musicChoiceAddress, playMusic);
+    }
+    else if (currentItem == "Sound On") {
+      playMusic = 1;
+      settings[4] = "Sound Off";
+      EEPROM.update(musicChoiceAddress, playMusic);
+    }
+    lcd.clear();
+    lastDisplayedMenu = currentMenuToDisplay;
+    currentMenuToDisplay = currentItem;
+    changedMenu = !changedMenu;
+    resetMenuVariables();
+  }
+  else if (SYSTEM_STATE == NAME_UPDATE_SCREEN) {
+    if (currentRow == 0) {
+      lockedLetter = !lockedLetter;
+      currentLetter = playerName[currentLetterPosition];
+    }
+    else {
+      setName();
     }
   }
-
-  lastDebounceTime = millis();
 }
 
 void displayGreeting() {
@@ -145,7 +148,6 @@ void displayGreeting() {
 }
 
 void resetMenuVariables() {
-
   currentMenuItem = 0;
   currentRow = 0;
   displayedItems[0] = 0;
@@ -159,7 +161,7 @@ String scrollLCDLeft(String toBeDisplayed) {
   L1++;
   L11++;
   if (L1 > StrProcess.length()) {
-    L1 = 15;
+    L1 = 14;
     L11 = 0;
   }
 
@@ -321,7 +323,7 @@ void displayMenu(String menu[]) {
     lcd.setCursor(1, 0);
     currentItem = menu[displayedItems[0]];
   }
-  if (menu[displayedItems[0]].length() < 15) {
+  if (menu[displayedItems[0]].length() < 14) {
     lcd.print(menu[displayedItems[0]]);
   }
   else {
@@ -336,7 +338,7 @@ void displayMenu(String menu[]) {
     currentItem = menu[displayedItems[1]];
   }
 
-  if (menu[displayedItems[1]].length() < 15) {
+  if (menu[displayedItems[1]].length() < 14) {
     lcd.print(menu[displayedItems[1]]);
   }
   else {
@@ -477,6 +479,14 @@ void displayTrophyAnimation() {
   }
 }
 
+void displayXAnimation() {
+  for (int row = 0; row < matrixSize; row++) {
+    for (int col = 0; col < matrixSize; col++) {
+      lc.setLed(0, row, col, xAnimationMatrix[row][col]);
+    }
+  }
+}
+
 void copyBirdPosition() {
   for (int i = 0; i < maxBirdSize; i++) {
     for (int j = 0; j < maxBirdSize; j++) {
@@ -535,7 +545,7 @@ void autoDecreaseBird() {
     copyBirdPosition();
     currentBirdPosition[1][0]++;
     currentBirdPosition[0][0]++;
-    if (currentBirdPosition[0][1] == 8) {
+    if (currentBirdPosition[0][0] == 7) {
       SYSTEM_STATE = GAME_LOST_SCREEN;
     }
     lastMoved = millis();
@@ -602,6 +612,37 @@ void moveObstacle() {
         }
       }
       obstacleColumn--;
+      for (int i = 0; i < matrixSize; i++) {
+        if (obstacleColumn != 0 && obstacleColumn != 1) {
+          matrix[i][obstacleColumn] = obstacle[i];
+        }
+        else {
+          if (i != currentBirdPosition[0][0] && i != currentBirdPosition[1][0]) {
+            matrix[i][obstacleColumn] = obstacle[i];
+          }
+        }
+
+      }
+      if (level > 4) {
+        if (level % 2) {
+          if (obstacleColumn % 2) {
+            shiftUp();
+          }
+          else {
+            shiftDown();
+          }
+        }
+        else {
+          if (obstacleColumn % 2) {
+            shiftDown();
+          }
+          else {
+            shiftUp();
+
+          }
+        }
+
+      }
     }
     else if (obstacleColumn == 0) {
       if (obstacle[currentBirdPosition[0][0]] == 1) {
@@ -613,6 +654,7 @@ void moveObstacle() {
         }
       }
       obstacleColumn--;
+
     }
     else {
       for (int i = 0; i < matrixSize; i++) {
@@ -790,11 +832,11 @@ void enterPlayerName() {
     lcd.setCursor(0, 1);
     lcd.write(rightArrow);
     lcd.setCursor(1, 1);
-    lcd.print("Set");
+    lcd.print(setCurrentName);
   }
   else {
     lcd.setCursor(0, 1);
-    lcd.print("Set");
+    lcd.print(setCurrentName);
   }
 
 }
@@ -828,14 +870,18 @@ void navigateName() {
   else {
     // up-down motion means changing the row
     if (yValue < minThreshold && joyMoved == false) {
-      joyMoved = !joyMoved;
+      if (joyMoved == false) {
+        joyMoved = !joyMoved;
+      }
       if (currentRow == 0) {
         currentRow = 1;
       }
       changedName = true;
     }
     if (yValue > maxThreshold && joyMoved == false) {
-      joyMoved = !joyMoved;
+      if (joyMoved == false) {
+        joyMoved = !joyMoved;
+      }
       if (currentRow == 1) {
         currentRow = 0;
       }
@@ -844,7 +890,9 @@ void navigateName() {
 
     // left-right motion means change the letter updated
     if (xValue < minThreshold && joyMoved == false) {
-      joyMoved = !joyMoved;
+      if (joyMoved == false) {
+        joyMoved = !joyMoved;
+      }
       currentLetterPosition--;
 
       if (currentLetterPosition < 0) {
@@ -853,7 +901,9 @@ void navigateName() {
     }
 
     if (xValue > maxThreshold && joyMoved == false) {
-      joyMoved = !joyMoved;
+      if (joyMoved == false) {
+        joyMoved = !joyMoved;
+      }
 
       currentLetterPosition++;
 
@@ -888,7 +938,6 @@ void resetGame() {
   changeLevelScore = 0;
 
   obstacleColumn = 7;
-  decreaseInterval = 2000;
   moveObstacleInterval = 1000;
   generated = 0;
 

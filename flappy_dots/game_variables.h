@@ -13,7 +13,7 @@ int currentBirdPosition[2][2] = {{3, 0}, {2, 1}};
 int lastBirdPosition[2][2];
 
 // if during this interval the player hasn't moved the bird, it will decrease on position
-int decreaseInterval = 500;
+#define decreaseInterval 500
 
 // variables for the obstacles
 // shape of the obstacle
