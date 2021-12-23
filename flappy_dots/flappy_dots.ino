@@ -36,8 +36,15 @@ void setup() {
   pinMode(pinX, INPUT);
   pinMode(pinY, INPUT);
 
-  noTone(buzzerPin);
-  playMusic = EEPROM.read(musicChoiceAddress);
+  playMusic = readIntFromEEPROM(musicChoiceAddress);
+
+  if (playMusic) {
+    settings[4] = "Sound Off";
+  }
+  else {
+    settings[4] = "Sound On";
+    noTone(buzzerPin);
+  }
 
   getHighScores();
 
@@ -59,6 +66,9 @@ void loop() {
         lastTone = millis();
       }
     }
+    else {
+      noTone(buzzerPin);
+    }
 
     switchMenues();
   }
@@ -73,7 +83,9 @@ void loop() {
     finishedGameScreen(gameWonMessage);
   }
   else if (SYSTEM_STATE == GAME_LOST_SCREEN) {
-    playDeathPitch();
+    if (playMusic) {
+      playDeathPitch();
+    }
     displayXAnimation();
     finishedGameScreen(gameLostMessage);
   }
@@ -112,12 +124,12 @@ void checkSw() {
     else if (currentItem == "Sound Off") {
       playMusic = 0;
       settings[4] = "Sound On";
-      EEPROM.update(musicChoiceAddress, playMusic);
+      writeIntIntoEEPROM(musicChoiceAddress, playMusic);
     }
     else if (currentItem == "Sound On") {
       playMusic = 1;
       settings[4] = "Sound Off";
-      EEPROM.update(musicChoiceAddress, playMusic);
+      writeIntIntoEEPROM(musicChoiceAddress, playMusic);
     }
     lcd.clear();
     lastDisplayedMenu = currentMenuToDisplay;

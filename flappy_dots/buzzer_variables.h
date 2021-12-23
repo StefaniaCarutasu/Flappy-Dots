@@ -1,5 +1,5 @@
 #include "pitches.h"
-const int buzzerPin = 1;
+const int buzzerPin = 6;
 
 float song[] = {
   DO1, MI, RE, FA, MI, SOL, FA, LA, SOL, SI, LA, DO2

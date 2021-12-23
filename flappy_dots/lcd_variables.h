@@ -6,7 +6,7 @@ const int V0 = 5;
 const int RS = 8;
 const int enable = 9;
 const int d4 = 7;
-const int d5 = 6;
+const int d5 = 1;
 const int d6 = 13;
 const int d7 = 3;
 
