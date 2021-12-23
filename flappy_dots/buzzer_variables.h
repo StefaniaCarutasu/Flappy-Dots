@@ -20,5 +20,16 @@ void playMelody() {
   int noteDuration = 1000 / noteDuration;
   tone(buzzerPin, song[note], noteDuration);
   note++;
+}
 
+void playDeathPitch() {
+  tone(buzzerPin, C2, 700);
+}
+
+void playMoveUpPitch() {
+  tone(buzzerPin, DO2, 200);
+}
+
+void playMoveDownPitch() {
+  tone(buzzerPin, DO1, 200);
 }

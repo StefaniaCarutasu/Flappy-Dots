@@ -73,6 +73,7 @@ void loop() {
     finishedGameScreen(gameWonMessage);
   }
   else if (SYSTEM_STATE == GAME_LOST_SCREEN) {
+    playDeathPitch();
     displayXAnimation();
     finishedGameScreen(gameLostMessage);
   }
@@ -156,7 +157,8 @@ void resetMenuVariables() {
 
 String scrollLCDLeft(String toBeDisplayed) {
   String result;
-  String StrProcess = "              " + toBeDisplayed + "               ";
+  String StrProcess = toBeDisplayed;
+  //String StrProcess = "              " + toBeDisplayed + "               ";
   result = StrProcess.substring(L1, L11);
   L1++;
   L11++;
@@ -316,34 +318,36 @@ void navigateMainMenu() {
 }
 
 void displayMenu(String menu[]) {
+  String top = menu[displayedItems[0]];
+  String bottom = menu[displayedItems[1]];
   // display the items in the menu that are indicated by the array
   lcd.setCursor(0, 0);
   if (currentRow == 0) {
     lcd.write(rightArrow);
     lcd.setCursor(1, 0);
-    currentItem = menu[displayedItems[0]];
+    currentItem = top;
   }
-  if (menu[displayedItems[0]].length() < 14) {
-    lcd.print(menu[displayedItems[0]]);
+  if (top.length() > 14) {
+    lcd.print(scrollLCDLeft(top));
+    delay(350);
   }
   else {
-    lcd.print(scrollLCDLeft(menu[displayedItems[0]]));
-    delay(350);
+    lcd.print(top);
   }
 
   lcd.setCursor(0, 1);
   if (currentRow == 1) {
     lcd.write(rightArrow);
     lcd.setCursor(1, 1);
-    currentItem = menu[displayedItems[1]];
+    currentItem = bottom;
   }
 
-  if (menu[displayedItems[1]].length() < 14) {
-    lcd.print(menu[displayedItems[1]]);
+  if (bottom.length() > 14) {
+    lcd.print(scrollLCDLeft(bottom));
+    delay(350);
   }
   else {
-    lcd.print(scrollLCDLeft(menu[displayedItems[1]]));
-    delay(350);
+    lcd.print(bottom);
   }
   // if i am on the last item of the menu, i display the arrow pointing upwards
   if (displayedItems[1] == 3) {
@@ -516,6 +520,10 @@ void moveBird() {
       birdMoved = 1;
       currentBirdPosition[1][0]--;
       currentBirdPosition[0][0]--;
+
+      if (playMusic) {
+        playMoveUpPitch();
+      }
     }
   }
 
@@ -526,6 +534,10 @@ void moveBird() {
       birdMoved = 1;
       currentBirdPosition[1][0]++;
       currentBirdPosition[0][0]++;
+
+      if (playMusic) {
+        playMoveDownPitch();
+      }
     }
   }
 
@@ -545,6 +557,11 @@ void autoDecreaseBird() {
     copyBirdPosition();
     currentBirdPosition[1][0]++;
     currentBirdPosition[0][0]++;
+
+    if (playMusic) {
+      playMoveDownPitch();
+    }
+
     if (currentBirdPosition[0][0] == 7) {
       SYSTEM_STATE = GAME_LOST_SCREEN;
     }
@@ -808,6 +825,17 @@ void enterPlayerName() {
     changedName = false;
   }
 
+  if (currentRow == 1) {
+    lcd.setCursor(0, 1);
+    lcd.write(rightArrow);
+    lcd.setCursor(1, 1);
+    lcd.print(setCurrentName);
+  }
+  else {
+    lcd.setCursor(0, 1);
+    lcd.print(setCurrentName);
+  }
+
   if (currentRow == 0) {
     lcd.setCursor(0, 0);
     lcd.write(rightArrow);
@@ -827,18 +855,6 @@ void enterPlayerName() {
       lcd.print(alphabet[playerName[i]]);
     }
   }
-
-  if (currentRow == 1) {
-    lcd.setCursor(0, 1);
-    lcd.write(rightArrow);
-    lcd.setCursor(1, 1);
-    lcd.print(setCurrentName);
-  }
-  else {
-    lcd.setCursor(0, 1);
-    lcd.print(setCurrentName);
-  }
-
 }
 
 void navigateName() {
@@ -937,25 +953,6 @@ void resetGame() {
   previousScore = 0;
   changeLevelScore = 0;
 
-  obstacleColumn = 7;
-  moveObstacleInterval = 1000;
-  generated = 0;
-
-  for (int i = 0; i < 3; i++) {
-    playerName[i] = 0;
-  }
-
-  for (int i = 0; i < matrixSize; i++) {
-    obstacle[i] = 0;
-  }
-
-  changedName = true;
-
-  currentLetterPosition = 0;
-  currentLetter = 0;
-
-  lockedLetter = false;
-
   currentMenuToDisplay = "Main";
   lastDisplayedMenu = "Main";
   currentItem = "";
@@ -964,7 +961,39 @@ void resetGame() {
 
   resetMenuVariables();
   resetMatrix();
+  resetObstacle();
+  resetBird();
   displayInitialAnimation();
+}
+
+void resetBird() {
+  currentBirdPosition[0][0] = 3;
+  currentBirdPosition[0][1] = 0;
+
+  currentBirdPosition[1][0] = 2;
+  currentBirdPosition[1][1] = 1;
+}
+
+void resetObstacle() {
+  obstacleColumn = 7;
+  moveObstacleInterval = 1000;
+  generated = 0;
+  for (int i = 0; i < matrixSize; i++) {
+    obstacle[i] = 0;
+  }
+}
+
+void resetPlayerName() {
+  for (int i = 0; i < 3; i++) {
+    playerName[i] = 0;
+  }
+
+  changedName = true;
+
+  currentLetterPosition = 0;
+  currentLetter = 0;
+
+  lockedLetter = false;
 }
 
 void resetMatrix() {

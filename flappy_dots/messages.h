@@ -15,3 +15,4 @@ const String displayName = "Name: ";
 const String setCurrentName = "Set";
 
 #define statisticsMessage "Your statistics"
+ 

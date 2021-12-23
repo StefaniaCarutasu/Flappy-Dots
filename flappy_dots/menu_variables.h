@@ -1,5 +1,7 @@
 #include "messages.h";
 
+#define Back "Back"
+
 // Main menu items
 String mainMenuItems[] = {
   "Start Game",
@@ -25,7 +27,7 @@ String settings[] = {
   "Mat. Bright.",
   "Reset Scores",
   "Sound Off",
-  "Back"
+  Back
 };
 
 String contrasts[] = {"Low", "Medium", "High", "Back"};
@@ -35,9 +37,12 @@ int brightnessLCDValues[] = {128, 140, 152};
 int brightnessMatrixValues[] = {2, 5, 8};
 
 // About menu
+#define owner "Carutasu Stefania"
+#define githubRepo "https://github.com/StefaniaCarutasu/Flappy-Dots"
+
 String about[] = {
   greetingMessage,
-  "Carutasu Stefania",
-  "https://github.com/StefaniaCarutasu/Flappy-Dots",
-  "Back"
+  owner,
+  githubRepo,
+  Back
 };

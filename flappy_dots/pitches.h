@@ -6,3 +6,4 @@
 #define LA 220.00
 #define SI 246.94
 #define DO2 261.63
+#define C2 65.41
