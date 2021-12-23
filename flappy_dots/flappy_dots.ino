@@ -22,7 +22,7 @@ void setup() {
   lcd.createChar(1, upArrowByte);
   lcd.createChar(2, rightArrowByte);
 
-  lcd.begin(16, 2);
+  lcd.begin(displayCols, displayRows);
 
   // setup matrix
   lc.shutdown(0, false); // turn off power saving, enables display
@@ -169,8 +169,8 @@ void resetMenuVariables() {
 
 String scrollLCDLeft(String toBeDisplayed) {
   String result;
-  String StrProcess = toBeDisplayed;
-  //String StrProcess = "              " + toBeDisplayed + "               ";
+  //String StrProcess = toBeDisplayed;
+  String StrProcess = toBeDisplayed + "               ";
   result = StrProcess.substring(L1, L11);
   L1++;
   L11++;
