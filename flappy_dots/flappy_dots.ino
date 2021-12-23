@@ -1000,12 +1000,14 @@ void resetPlayerName() {
     playerName[i] = 0;
   }
 
-  changedName = true;
+  changedName = false;
+  enterName = true;
 
   currentLetterPosition = 0;
   currentLetter = 0;
 
   lockedLetter = false;
+  newName = "";
 }
 
 void resetMatrix() {
