@@ -436,7 +436,7 @@ void setMatrixBrightness(String brightness) {
     brightnessValue = brightnessMatrixValues[2];
   }
 
-  lc.setIntensity(0, brightnessMatrixValues[2]);
+  lc.setIntensity(0, brightnessValue);
   EEPROM.update(matrix_brightness_address, brightnessValue);
 
   lcd.clear();
