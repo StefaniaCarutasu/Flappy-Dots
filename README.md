@@ -85,10 +85,10 @@ A greeting containing the name of the game is displayed when the game is launche
 - **joystick_variables.h**: contains all the variables needed to operate de joystick such as the pins used, the debounce interval for the button and the min and max thresholds.
 - **lcd_variables.h**: constains all the variables used for the LCD such as the pins, the EEPROM addresses used to store the values for brightness and contrast, and the icons for the arrows displayed. 
 - **matrix_variables.h**: contains all the variables used for the matrix such as the pins, the matrixed used in the game and the matrices used to display the animations
-- **menu_variables.h**: 
-- **messages.h**:
-- **pitches.h**:
-- **system_states.h**:
+- **menu_variables.h**: contains all the variables needed to display all the available menus such as lists of elements to be displayed, the current menu, the last displayed menu, the current selected item and the current row.
+- **messages.h**: contains all the messages displayed on the lcd, before, during and after the game
+- **pitches.h**: constains musical pitches used to make the theme song and the rest of the sounds.
+- **system_states.h**: contains all the possible states of the system. in the loop function, the state of the sistem is checked to check the phase of the game and call the needed functions accordingly.
 
 <br/>
 
