@@ -22,7 +22,7 @@ A greeting containing the name of the game is displayed when the game is launche
 <br/>
 
 ### Game logic
-- In the begining, the "bird" is formed of two dots floating on the first column, respectivly second column, of the matrix. 
+- The "bird" is formed of two dots floating on the first column, respectivly second column, of the matrix. 
 - An obstacle similar to those used in Flappy Bird is generated on the last column of the matrix. The obstacle travels towards the "bird" that must avoid it. If the obstacle is succesfully avoided, the score increases and a new obstacle is generated.
 - With each level passed, the obstacles increase in speed. Starting with level 5, the obstacles shift up and down with each movement, increasing the difficulty of the game.
 - If the player is inactive for a certain amount of time, the "bird" will fall one position. If the bird touches the bottom row, the player loses the game and a message is shown along with the score. 
