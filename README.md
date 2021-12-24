@@ -99,7 +99,8 @@ A greeting containing the name of the game is displayed when the game is launche
 ![](https://github.com/StefaniaCarutasu/Flappy-Dots/blob/main/setup_pictures/setup_picture_phase2.jpeg)
 
 ## Setup picture phase 3
+![](https://github.com/StefaniaCarutasu/Flappy-Dots/blob/main/setup_pictures/setup_picture_phase3.jpeg)
 
 ## Demo video
-[]()
+[https://youtu.be/0vfUTEERD_A](https://youtu.be/0vfUTEERD_A)
 
