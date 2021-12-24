@@ -7,7 +7,7 @@
 #define gameStartedMessage "Game Started"
 
 #define gameWonMessage "You're a star!"
-#define  gameLostMessage "You big loser..."
+#define  gameLostMessage "You lost..."
 
 const String displayLevel = "Level:";
 const String displayScore = "Score:";

@@ -131,9 +131,15 @@ void checkSw() {
       settings[4] = "Sound Off";
       writeIntIntoEEPROM(musicChoiceAddress, playMusic);
     }
+    if (currentItem == "Reset Scores") {
+      lastDisplayedMenu = "Setttings";
+      currentMenuToDisplay == "Main";
+    }
+    else {
+      lastDisplayedMenu = currentMenuToDisplay;
+      currentMenuToDisplay = currentItem;
+    }
     lcd.clear();
-    lastDisplayedMenu = currentMenuToDisplay;
-    currentMenuToDisplay = currentItem;
     changedMenu = !changedMenu;
     resetMenuVariables();
   }
@@ -148,6 +154,10 @@ void checkSw() {
   }
 }
 
+/*
+   displays the name of the game
+*/
+
 void displayGreeting() {
   displayInitialAnimation();
   int initialPos;
@@ -159,6 +169,10 @@ void displayGreeting() {
 
   SYSTEM_STATE = MENU_SCREEN;
 }
+
+/*
+   resets the variables used to handle the menu
+*/
 
 void resetMenuVariables() {
   currentMenuItem = 0;
@@ -182,6 +196,10 @@ String scrollLCDLeft(String toBeDisplayed) {
   return result;
 }
 
+
+/*
+   displays a message indicating the game has started
+*/
 void displayStartGameMessage() {
   lcd.clear();
   int initialPos;
@@ -192,6 +210,11 @@ void displayStartGameMessage() {
   lcd.clear();
 }
 
+/*
+   switching between menues
+   checks the currentMenuToDisplay variable and shows the menu accordingly
+   it cleares the display so the next menu can be displayed
+*/
 void switchMenues() {
   navigateMainMenu();
   if (currentMenuToDisplay == "High Scores") {
@@ -281,6 +304,12 @@ void switchMenues() {
   }
 }
 
+/*
+   in menu navigation
+   it hovers between the elements of the menu accordingly to the joystick's movement
+   it overwrites the variables with what needs to be displayed
+   it memorises the the current row
+*/
 void navigateMainMenu() {
   // go upwards
   if (yValue > maxThreshold && joyMoved == false) {
@@ -329,6 +358,12 @@ void navigateMainMenu() {
   }
 }
 
+/*
+    displayes the menu passed as variable
+    on the current row, an arrow is displayed to indicate the current position
+    if the menu item has more than 14 letters, the item is scrolled on the lcd
+    on the right side there are arrows pointing towards the direction in which the player can scroll
+*/
 void displayMenu(String menu[]) {
   String top = menu[displayedItems[0]];
   String bottom = menu[displayedItems[1]];
@@ -380,6 +415,10 @@ void displayMenu(String menu[]) {
   }
 }
 
+/*
+   the parametre of the function is received accordingly to the player's choice in the menu
+   the value is update in EEPROM
+*/
 void setLCDContrast(String contrast) {
   int contrastValue;
 
@@ -402,6 +441,10 @@ void setLCDContrast(String contrast) {
   currentMenuToDisplay = "Settings";
 }
 
+/*
+   the parametre of the function is received accordingly to the player's choice in the menu
+   the value is update in EEPROM
+*/
 void setLCDBrightness(String brightness) {
   int brightnessValue;
 
@@ -423,6 +466,10 @@ void setLCDBrightness(String brightness) {
 
 }
 
+/*
+   the parametre of the function is received accordingly to the player's choice in the menu
+   the value is update in EEPROM
+*/
 void setMatrixBrightness(String brightness) {
   int brightnessValue;
 
@@ -443,10 +490,16 @@ void setMatrixBrightness(String brightness) {
   currentMenuToDisplay = "Settings";
 }
 
-// game logic functions
-
+/*
+   the function is responsible for implementing the game logic
+   the current level and scored are displayed
+   if an obstacle hasn't been generated yet or the bird has passed it, a new one is generated
+   the obstacle is moved automatically
+   the player has the option to move the bird from the joystick
+   if the player hasn't moved the bird, it decreases automatically
+   if there are any changes, the led matrix is updated
+*/
 void gameLogic() {
-  //updateByteMatrix();
   displayCurrentLevel();
   if (generated == 0) {
     generateObstacle();
@@ -462,7 +515,12 @@ void gameLogic() {
   }
 }
 
-
+/*
+   the matrix is cleared
+   the state of the system becomes IN_GAME_STATE
+   the bird is on it's initial position
+   the display is cleared
+*/
 void initialliseGame() {
   lc.clearDisplay(0);
   SYSTEM_STATE = IN_GAME_SCREEN;
@@ -471,6 +529,10 @@ void initialliseGame() {
   lcd.clear();
 }
 
+
+/*
+   the function updates the led matrix accordingly to the changes on the game matrix
+*/
 void updateMatrix() {
   for (int row = 0; row < matrixSize; row++) {
     for (int col = 0; col < matrixSize; col++) {
@@ -478,6 +540,10 @@ void updateMatrix() {
     }
   }
 }
+
+/*
+   the function updates the led matrix with the bird animation displayed while the player scrolls through the menu
+*/
 
 void displayInitialAnimation() {
   for (int row = 0; row < matrixSize; row++) {
@@ -487,6 +553,9 @@ void displayInitialAnimation() {
   }
 }
 
+/*
+   the function updates the led matrix with the trophy animation displayed when the player has surpassed a highscore
+*/
 void displayTrophyAnimation() {
   for (int row = 0; row < matrixSize; row++) {
     for (int col = 0; col < matrixSize; col++) {
@@ -495,6 +564,9 @@ void displayTrophyAnimation() {
   }
 }
 
+/*
+   the function updates the led matrix with the X animation displayed when the player has lost the game
+*/
 void displayXAnimation() {
   for (int row = 0; row < matrixSize; row++) {
     for (int col = 0; col < matrixSize; col++) {
@@ -503,6 +575,10 @@ void displayXAnimation() {
   }
 }
 
+
+/*
+   before the bird has changed position, the current position is stored
+*/
 void copyBirdPosition() {
   for (int i = 0; i < maxBirdSize; i++) {
     for (int j = 0; j < maxBirdSize; j++) {
@@ -511,6 +587,10 @@ void copyBirdPosition() {
   }
 }
 
+
+/*
+   the function updates the matrix accordingly to the bird's movement
+*/
 void updateBirdMatrix() {
 
   matrix[lastBirdPosition[0][0]][lastBirdPosition[0][1]] = 0;
@@ -520,6 +600,14 @@ void updateBirdMatrix() {
   matrix[currentBirdPosition[1][0]][currentBirdPosition[1][1]] = 1;
 }
 
+
+/*
+   the moment the bird last moved is updated (it's needed to automatically decrease the bird if the player hasn't moved)
+   if the player has moved the joystick upwards, the bird moves one position upwards (if it has space on the matrix)
+   if the sound is on, a pitch is played with the movement
+
+   the same logic is behind the downwards movement
+*/
 void moveBird() {
   readJoystick();
 
@@ -564,8 +652,17 @@ void moveBird() {
 
 }
 
+
+/*
+   the moment the bird last moved is updated
+   the position of the bird is incremented
+   a pitch is played with the movement
+   if the bird touches the last row of the matrix, the game is considered lost and the state of the system chages
+
+*/
 void autoDecreaseBird() {
   if (millis() - lastMoved > decreaseInterval) {
+    lastMoved = millis();
     copyBirdPosition();
     currentBirdPosition[1][0]++;
     currentBirdPosition[0][0]++;
@@ -577,13 +674,19 @@ void autoDecreaseBird() {
     if (currentBirdPosition[0][0] == 7) {
       SYSTEM_STATE = GAME_LOST_SCREEN;
     }
-    lastMoved = millis();
 
     matrixChanged = true;
     updateBirdMatrix();
   }
 }
 
+
+/*
+ * a new obstacle is generated so the matrix has changed
+ * the column the obstacle is generated on is the last one of the matrix
+ * a row to start the obstacle on is randomly generated
+ * each obstacle consists of a column on the matrix with 3 empty spaces in in 
+ */
 void generateObstacle() {
   matrixChanged = true;
   obstacleColumn = 7;
@@ -626,6 +729,19 @@ void shiftDown() {
   obstacle[0] = o;
 }
 
+
+/*
+ * the obstacles move at a fixed interval (fixed for the level)
+ * if the obstacle is on the second column and the bird touches it, the game is lost
+ * if the obstacle is on the first column and the bird touches it, the game is lost
+ * if the bird hasn't had contact with the obstacle, the latter one shifts one column to the left
+ * if it was already on the first column, a new obstacle with similar properties and behaviour is generated
+ * if the bird succesfully avoided the obstacle, the score is increased
+ * if it's the case, the level is increased
+ * the speed of the obstacle increased with the level
+ * if the level is greater than 4, the obstacle shifts up or down, depending on the parity of the column it's on
+ * if the score is greater than 50, the game is considered won
+ */
 void moveObstacle() {
   if (millis() - lastMovedObstacle > moveObstacleInterval) {
     // it's time to move the obstacle one column towards the bird
@@ -750,6 +866,10 @@ void moveObstacle() {
   }
 }
 
+/*
+ * displays the current level and score as the game progresses
+ */
+
 void displayCurrentLevel() {
   if (score != previousScore) {
     previousScore = score;
@@ -769,6 +889,10 @@ void displayCurrentLevel() {
 
 }
 
+
+/*
+ * the parametre of the function is the message that's shown at the end of the game (a good message if the player has won and a bad one if the player has lost)
+ */
 void finishedGameScreen(String message) {
   lcd.clear();
 
@@ -784,6 +908,10 @@ void finishedGameScreen(String message) {
   displayEndGameStatistics();
 }
 
+
+/*
+ * it displays a congratulatory message on the display
+ */
 void displayCongrats() {
   lcd.clear();
   lcd.setCursor(0, 0);
@@ -797,6 +925,12 @@ void displayCongrats() {
   lcd.clear();
 }
 
+/*
+ * shows the player their statistics (level and score he had when the game was over)
+ * if compares the score with the highest scores
+ * if the score is greater than one of the existing scores, the trophy animation and congratulatory message are displayed and the player is asked to enter their name
+ * if the score is not a highscore, the game is reset
+ */
 void displayEndGameStatistics() {
 
   lcd.setCursor(0, 0);
@@ -830,6 +964,12 @@ void displayEndGameStatistics() {
   }
 }
 
+
+/* 
+ *  the function prints on the lcd the interface used to enter the name
+ *  on the first, row the player has the option to modify the letters in the name
+ *  on the second, row the player can set the name
+ */
 void enterPlayerName() {
 
   if (changedName) {

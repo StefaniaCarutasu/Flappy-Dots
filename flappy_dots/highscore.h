@@ -105,4 +105,5 @@ void resetScores() {
   }
 
   updateEEPROM();
+  getHighScores();
 }
