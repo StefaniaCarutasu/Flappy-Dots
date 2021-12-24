@@ -16,6 +16,10 @@ int note = 0;
 #define musicChoiceAddress 19
 int playMusic = 1;
 
+
+/*
+ * playes the current note of the song
+ */
 void playMelody() {
   int noteDuration = 1000 / noteDuration;
   tone(buzzerPin, song[note], noteDuration);

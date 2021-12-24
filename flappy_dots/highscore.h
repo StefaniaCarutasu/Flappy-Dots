@@ -29,6 +29,10 @@ int readIntFromEEPROM(int address)
   return (int)((byte1 << 8) + byte2);
 }
 
+/*
+ * gets all the scores from EEPROM
+ * updates the scores array that will be displayed on the LCD
+ */
 void getHighScores() {
 
   int current = 0;
@@ -56,6 +60,12 @@ void getHighScores() {
   }
 }
 
+
+/*
+ * Compares the scores with the new one
+ * if the score has surpassed an existing one, a value >= 0 is returned
+ * the value is check to establish if the player must enter their name
+ */
 int compareScores(int score) {
   for (int i = 0; i < 3; i++) {
     if (score > highscoreValues[i]) {
@@ -66,6 +76,9 @@ int compareScores(int score) {
   return -1;
 }
 
+/*
+ * shifts the scores accordingly to the right position of the new score
+ */
 void shiftScores(String player, int score, int pos) {
   if (pos == 1) {
     highscoreNames[2] = highscoreNames[1];
@@ -83,6 +96,9 @@ void shiftScores(String player, int score, int pos) {
   highscoreValues[pos] = score;
 }
 
+/*
+ * updates EEPROM with the new rankings
+ */
 void updateEEPROM() {
 
   for (int i = 0; i < 3; i++) {
@@ -98,6 +114,9 @@ void updateEEPROM() {
   }
 }
 
+/*
+ * resets all the scores
+ */
 void resetScores() {
   for (int i = 0; i < 3; i++) {
     highscoreNames[i] = "aaa";

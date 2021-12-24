@@ -1,3 +1,24 @@
+/*
+ * PROJECT ARCHITECTURE
+*flappy_dots.ino: main file of the project where the setup, loop and most of the functionalities are written.
+*buzzer_variables.h: constains all the variables for the buzzer such as the pin, the theme song, the EEPROM address where the sound option is stored, and functions for playing the different available sounds.
+*game_variables.h: contains all the variables needed for the game logic such as the position of the bird, the shape, posion and speed of the obstacles, the level and score all the variables needed to enter and store the player's name.
+*highscore.h: contains all the variables and functions needed to store and retrieve the highscores. The score achieved by the player is compared with the existing ones. If is surpassed any of the existing scores, they are shifted to make room for the new one. The file also contains the functions for writting and retrieving integres from EEPROM.
+*joystick_variables.h: contains all the variables needed to operate de joystick such as the pins used, the debounce interval for the button and the min and max thresholds.
+*lcd_variables.h: constains all the variables used for the LCD such as the pins, the EEPROM addresses used to store the values for brightness and contrast, and the icons for the arrows displayed.
+*matrix_variables.h: contains all the variables used for the matrix such as the pins, the matrixed used in the game and the matrices used to display the animations
+*menu_variables.h: contains all the variables needed to display all the available menus such as lists of elements to be displayed, the current menu, the last displayed menu, the current selected item and the current row.
+*messages.h: contains all the messages displayed on the lcd, before, during and after the game
+*pitches.h: constains musical pitches used to make the theme song and the rest of the sounds.
+*system_states.h: contains all the possible states of the system. in the loop function, the state of the sistem is checked to check the phase of the game and call the needed functions accordingly.
+*/
+
+/*
+ * MOST IMPORTANTS FUNCTIONS
+ * -> moveBird(): receives info from the joystick and moves the bird accordingly
+ * -> moveObstacle(): moves the obstacle from the last column towards the first
+ * -> autoDecreaseBird(): if the player hasn't moved the bird during an interval, the bird is decreased automatically
+ */
 #include "system_states.h";
 #include "joystick_variables.h";
 #include "lcd_variables.h";
@@ -106,6 +127,11 @@ void handleInterrupt() {
     checkSw();
   }
 }
+
+/*
+ * if the SYSTEM_STATE is MENU_SCREEN, the click of the button can mean changing the current menu or changing the settings
+ * if the SYSTEM_STATE is NAME_UPDATE_SCREEN, the click of the button can mean locking the letter (if the player is currently on the first row) or setting the name (if the player is on the second row)
+ */
 
 void checkSw() {
   if (SYSTEM_STATE == MENU_SCREEN ) {
@@ -1009,6 +1035,14 @@ void enterPlayerName() {
   }
 }
 
+
+/*
+ * name navigation using the joystick
+ * if the letter is locked, the player can change de value of the letter, using an up and down movement of the joystick
+ * if the letter is not locked, the player can move between the 3 letters, with a left and right movement
+ * if the letter is not locked, the player can change rows with and up and down movement
+ * if the button on the joystick is clicked when the player is on the second row, the name is set in the form displayed on the first row
+ */
 void navigateName() {
   if (lockedLetter) {
     // if the joystick was moved up-down
@@ -1088,6 +1122,10 @@ void navigateName() {
   }
 }
 
+/*
+ * after the name was set, the new rank of the player is determined
+ * the current scores are shifted and EEPROM is updated accordingly
+ */
 void setName() {
   for (int i = 0; i < 3; i++) {
     newName += alphabet[playerName[i]];
@@ -1098,6 +1136,10 @@ void setName() {
   resetGame();
 }
 
+
+/*
+ * the function resets all the variables as they were before starting the game
+ */
 void resetGame() {
 
   SYSTEM_STATE = MENU_SCREEN;
