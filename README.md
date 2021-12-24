@@ -77,6 +77,21 @@ A greeting containing the name of the game is displayed when the game is launche
 
 <br/>
 
+### Project Architecture
+- **flappy_dots.ino**: main file of the project where the setup, loop and most of the functionalities are written.
+- **buzzer_variables.h**: constains all the variables for the buzzer such as the pin, the theme song, the EEPROM address where the sound option is stored, and functions for playing the different available sounds.
+- **game_variables.h**: contains all the variables needed for the game logic such as the position of the bird, the shape, posion and speed of the obstacles, the level and score all the variables needed to enter and store the player's name.
+- **highscore.h**: contains all the variables and functions needed to store and retrieve the highscores. The score achieved by the player is compared with the existing ones. If is surpassed any of the existing scores, they are shifted to make room for the new one. The file also contains the functions for writting and retrieving integres from EEPROM. 
+- **joystick_variables.h**: contains all the variables needed to operate de joystick such as the pins used, the debounce interval for the button and the min and max thresholds.
+- **lcd_variables.h**: constains all the variables used for the LCD such as the pins, the EEPROM addresses used to store the values for brightness and contrast, and the icons for the arrows displayed. 
+- **matrix_variables.h**: contains all the variables used for the matrix such as the pins, the matrixed used in the game and the matrices used to display the animations
+- **menu_variables.h**: 
+- **messages.h**:
+- **pitches.h**:
+- **system_states.h**:
+
+<br/>
+
 ## Setup picture phase 1
 ![](https://github.com/StefaniaCarutasu/Flappy-Dots/blob/main/setup_pictures/setup_picture_phase1.jpeg)
 
@@ -84,3 +99,7 @@ A greeting containing the name of the game is displayed when the game is launche
 ![](https://github.com/StefaniaCarutasu/Flappy-Dots/blob/main/setup_pictures/setup_picture_phase2.jpeg)
 
 ## Setup picture phase 3
+
+## Demo video
+[]()
+
